@@ -3,7 +3,7 @@
 # telemux
 Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library
 
-![Screenshot](./screenshot.jpg)
+![Screenshot](./screenshot.jpg?)
 
 # Motivation
 
