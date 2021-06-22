@@ -12,6 +12,8 @@ I strongly recommend you to take a look at it since telemux is mostly an extensi
 
 Patterns such as handlers, persistence & filters were inspired by a wonderful [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library.
 
+This project is in early beta stage. Contributions are welcome! Feel free to submit an issue if you have any questions, suggestions or simply want to help.
+
 # Features
 
 - Extension for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library, meaning you'll still use all of its features
