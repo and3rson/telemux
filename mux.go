@@ -16,8 +16,8 @@ type Mux struct {
 // Update is an alias for tgbotapi.Update.
 type Update = tgbotapi.Update
 
-// CreateMux creates new Mux.
-func CreateMux() *Mux {
+// NewMux creates new Mux.
+func NewMux() *Mux {
 	return &Mux{}
 }
 

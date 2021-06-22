@@ -23,8 +23,8 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-	mux := tm.CreateMux().
-		AddHandler(tm.CreateHandler(
+	mux := tm.NewMux().
+		AddHandler(tm.NewHandler(
 			tm.And(tm.IsPrivate(), tm.IsCommand("start")),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
@@ -33,7 +33,7 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.CreateHandler(
+		AddHandler(tm.NewHandler(
 			tm.IsCommand("start"),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(

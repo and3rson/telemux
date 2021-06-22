@@ -33,8 +33,8 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-	mux := tm.CreateMux().
-		AddHandler(tm.CreateHandler(
+	mux := tm.NewMux().
+		AddHandler(tm.NewHandler(
 			tm.IsCommand("start"),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
@@ -43,7 +43,7 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.CreateHandler(
+		AddHandler(tm.NewHandler(
 			tm.IsText(),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
@@ -52,7 +52,7 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.CreateHandler(
+		AddHandler(tm.NewHandler(
 			tm.IsPhoto(),
 			func(u *tm.Update) {
 				photo := (*u.Message.Photo)[0]
@@ -62,7 +62,7 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.CreateHandler(
+		AddHandler(tm.NewHandler(
 			tm.IsLocation(),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
@@ -71,7 +71,7 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.CreateHandler(
+		AddHandler(tm.NewHandler(
 			tm.Any(),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(

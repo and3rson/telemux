@@ -17,17 +17,17 @@ type TransitionHandler struct {
 	Handle func(u *tgbotapi.Update, data Data) string
 }
 
-// CreateHandler creates a new handler.
-func CreateHandler(filter Filter, handle func(u *Update)) *Handler {
+// NewHandler creates a new handler.
+func NewHandler(filter Filter, handle func(u *Update)) *Handler {
 	return &Handler{filter, handle}
 }
 
-// CreateTransitionHandler creates a new transition handler for a conversation handler.
-func CreateTransitionHandler(filter Filter, handle func(u *Update, data Data) string) *TransitionHandler {
+// NewTransitionHandler creates a new transition handler for a conversation handler.
+func NewTransitionHandler(filter Filter, handle func(u *Update, data Data) string) *TransitionHandler {
 	return &TransitionHandler{filter, handle}
 }
 
-// CreateConversationHandler creates a conversation.
+// NewConversationHandler creates a conversation.
 //
 // "conversationID" distinguishes this conversation from the others. The main goal of this identifier is to allow persistence to keep track of different conversation states independently without mixing them together.
 //
@@ -37,7 +37,7 @@ func CreateTransitionHandler(filter Filter, handle func(u *Update, data Data) st
 // In order to switch to a different state your TransitionHandler must return a string that contains the name of the state you want to switch into.
 //
 // "defaults" are "appended" to every state. They are useful to handle commands such as "/cancel" or to display some default message.
-func CreateConversationHandler(
+func NewConversationHandler(
 	conversationID string,
 	persistence ConversationPersistence,
 	states map[string][]*TransitionHandler,

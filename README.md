@@ -1,3 +1,5 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/and3rson/telemux.svg)](https://pkg.go.dev/github.com/and3rson/telemux)
+
 # telemux
 Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library
 
@@ -38,14 +40,14 @@ func main() {
 
     // Create a multiplexer with two handlers: one for command and one for all messages.
     // If a handler cannot handle the update (fails the filter), multiplexer will proceed to the next handler.
-    mux := tm.CreateMux().
-        AddHandler(tm.CreateHandler(
+    mux := tm.NewMux().
+        AddHandler(tm.NewHandler(
             tm.IsCommand("start"),
             func(u *tm.Update) {
                 bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Hello! I'm a simple bot who repeats everything you say. :)"))
             },
         )).
-        AddHandler(tm.CreateHandler(
+        AddHandler(tm.NewHandler(
             tm.Any(),
             func(u *tm.Update) {
                 bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "You said: "+u.Message.Text))
