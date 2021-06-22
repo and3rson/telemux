@@ -3,6 +3,8 @@
 # telemux
 Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library
 
+![Screenshot](./screenshot.jpg)
+
 # Motivation
 
 This library serves as an addition to the [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library.
@@ -12,6 +14,7 @@ Patterns such as handlers, persistence & filters were inspired by a wonderful [p
 
 # Features
 
+- Extension for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library, meaning you'll still use all of its features
 - Designed with statelessness in mind
 - Extensible handler configuration inspired by [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library
 - Conversations (aka Dialogs) based on finite-state machines (see [./examples/album_conversation.go](./examples/album_conversation.go))
@@ -73,12 +76,47 @@ Mux (multiplexer) is a "router" for instances of `tgbotapi.Update`.
 
 It allows you to register handlers and will take care to choose an appropriate handler based on the incoming update.
 
+In order to work, you must dispatch messages (that come from go-telegram-bot-api channel):
+
+```go
+mux := tm.NewMux()
+// ...
+// add handlers to mux here
+// ...
+updates, _ := bot.GetUpdatesChan(u)
+for update := range updates {
+    mux.Dispatch(&update)
+}
+```
+
 ## Handlers & filters
 
 Handler consists of filter and handle-function.
 
 Handler's filter decides whether this handler can handle the incoming update.
 If so, handle-function is called. Otherwise multiplexer will proceed to the next handler.
+
+There are some built-in filters such as `IsPhoto`, `IsPrivate` etc.
+They can also be chained using `And`, `Or` and `Not`. For example:
+
+```go
+mux := tm.NewMux()
+
+// Add handler that accepts photos sent to the bot in a private chat:
+mux.AddHandler(And(tm.IsPrivate(), tm.IsPhoto()), func(u *tm.Update) { /* ... */ })
+
+// Add handler that accepts bot photos and test messages:
+mux.AddHandler(Or(tm.IsText(), tm.IsPhoto()), func(u *tm.Update) { /* ... */ })
+
+// Since filters are plain functions, you can easily implement them yourself.
+// Below we add handler that allows onle a specific user to call "/restart" command:
+mux.AddHandler(tm.NewHandler(
+    tm.And(tm.IsCommand("restart"), func(u *tm.Update) bool {
+        return u.Message.From.ID == 3442691337
+    }),
+    func(u *tm.Update) { /* ... */ },
+))
+```
 
 ## Conversations & persistence
 
