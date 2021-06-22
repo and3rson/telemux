@@ -60,7 +60,9 @@ func main() {
 
 # Documentation
 
-The documentation is available [here](https://pkg.go.dev/and3rson/telemux).
+The documentation is available [here](https://pkg.go.dev/github.com/and3rson/telemux).
+
+Examples are available [here](./examples/).
 
 # Terminology
 
