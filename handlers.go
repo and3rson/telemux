@@ -27,13 +27,13 @@ func NewTransitionHandler(filter Filter, handle func(u *Update, data Data) strin
 	return &TransitionHandler{filter, handle}
 }
 
-// NewConversationHandler creates a conversation.
+// NewConversationHandler creates a conversation handler.
 //
 // "conversationID" distinguishes this conversation from the others. The main goal of this identifier is to allow persistence to keep track of different conversation states independently without mixing them together.
 //
 // "persistence" defines where to store conversation state & intermediate inputs from the user. Without persistence, a conversation would not be able to "remember" what "step" the user is at.
 //
-// "states" define which TransitionHandlers to use in what state. States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at. It's recommended to have an empty string (`""`) as an initial state (i. e. if the conversation has not started yet or has already finished.) For each state you can provide a list of at least one TransitionHandler. If none of the handlers can handle the update, the default handlers are attempted (see below).
+// "states" define the TransitionHandlers to use in what state. States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at. It's recommended to have an empty string (`""`) as an initial state (i. e. if the conversation has not started yet or has already finished.) For each state you can provide a list of at least one TransitionHandler. If none of the handlers can handle the update, the default handlers are attempted (see below).
 // In order to switch to a different state your TransitionHandler must return a string that contains the name of the state you want to switch into.
 //
 // "defaults" are "appended" to every state. They are useful to handle commands such as "/cancel" or to display some default message.
@@ -45,7 +45,8 @@ func NewConversationHandler(
 ) *Handler {
 	return &Handler{
 		func(u *Update) bool {
-			pk := PersistenceKey{u.Message.From.ID, u.Message.Chat.ID}
+			user, chat := GetEffectiveUser(u), GetEffectiveChat(u)
+			pk := PersistenceKey{user.ID, chat.ID}
 			candidates := states[persistence.GetState(conversationID, pk)]
 			if len(defaults) > 0 {
 				candidates = append(candidates, defaults...)
@@ -58,7 +59,8 @@ func NewConversationHandler(
 			return false
 		},
 		func(u *tgbotapi.Update) {
-			pk := PersistenceKey{u.Message.From.ID, u.Message.Chat.ID}
+			user, chat := GetEffectiveUser(u), GetEffectiveChat(u)
+			pk := PersistenceKey{user.ID, chat.ID}
 			candidates := states[persistence.GetState(conversationID, pk)]
 			if len(defaults) > 0 {
 				candidates = append(candidates, defaults...)

@@ -99,7 +99,7 @@ Handler's filter decides whether this handler can handle the incoming update.
 If so, handle-function is called. Otherwise multiplexer will proceed to the next handler.
 
 There are some built-in filters such as `IsPhoto`, `IsPrivate` etc.
-They can also be chained using `And`, `Or` and `Not`. For example:
+They can also be chained using `And`, `Or`, and `Not`. For example:
 
 ```go
 mux := tm.NewMux()
@@ -154,3 +154,36 @@ To create a ConversationHandler you need to provide the following:
     Useful to handle commands such as "/cancel" or to display some default message.
 
 See [./examples/album_conversation.go](./examples/album_conversation.go) for a conversation example.
+
+# Tips & common pitfalls
+
+## Getting user/chat/message object from update
+
+When having handlers for wide filters (e. g. `Or(IsText(), IsEditedMessage(), IsInlineQuery())`) you may often fall
+in situations when you need to check for multiple user/chat/message attributes. In such situations sender's data may
+be in one of few places depending on which update has arrived: `u.Message.From`, `u.EditedMessage.From`, or `u.InlineQuery.From`.
+Similar issue applies to fetching actual chat info or message object from an update.
+
+In such cases it's highly recommended to use helper functions from the [helpers](./helpers.go) module:
+
+```go
+// Bad:
+fmt.Println(u.Message.Chat.ID) // u.Message may be nil
+
+// Better, but not so DRY:
+chatId int64
+if u.Message != nil {
+    chatId = u.Message.Chat.ID
+} else if u.EditedMessage != nil {
+    chatId = u.EditedMessage.Chat.ID
+} else if u.CallbackQuery != nil {
+    chatId = u.CallbackQuery.Chat.ID
+} // And so on... Duh.
+fmt.Println(chatId)
+
+// Best:
+chat := GetEffectiveChat(u)
+if chat != nil {
+    fmt.Println(chat.ID)
+}
+```
