@@ -233,6 +233,26 @@ func IsChannel() Filter {
 	}
 }
 
+// IsNewChatMembers filters updates that have users in NewChatMembers property.
+func IsNewChatMembers() Filter {
+	return func(u *Update) bool {
+		if message := u.EffectiveMessage(); message != nil {
+			return len(*message.NewChatMembers) > 0
+		}
+		return false
+	}
+}
+
+// IsLeftChatMember filters updates that have user in LeftChatMember property.
+func IsLeftChatMember() Filter {
+	return func(u *Update) bool {
+		if message := u.EffectiveMessage(); message != nil {
+			return message.LeftChatMember != nil
+		}
+		return false
+	}
+}
+
 // And filters updates that pass ALL of the provided filters.
 func And(filters ...Filter) Filter {
 	return func(u *Update) bool {
