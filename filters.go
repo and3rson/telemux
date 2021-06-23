@@ -15,6 +15,48 @@ func Any() Filter {
 	}
 }
 
+// IsMessage filters updates that look like message (text, photo, location etc.)
+func IsMessage() Filter {
+	return func(u *Update) bool {
+		return u.Message != nil
+	}
+}
+
+// IsInlineQuery filters updates that are callbacks from inline queries.
+func IsInlineQuery() Filter {
+	return func(u *Update) bool {
+		return u.InlineQuery != nil
+	}
+}
+
+// IsCallbackQuery filters updates that are callbacks from button presses.
+func IsCallbackQuery() Filter {
+	return func(u *Update) bool {
+		return u.CallbackQuery != nil
+	}
+}
+
+// IsEditedMessage filters updates that are edits to existing messages.
+func IsEditedMessage() Filter {
+	return func(u *Update) bool {
+		return u.EditedMessage != nil
+	}
+}
+
+// IsChannelPost filters updates that are channel posts.
+func IsChannelPost() Filter {
+	return func(u *Update) bool {
+		return u.ChannelPost != nil
+	}
+}
+
+// EditedChannelPost filters updates that are edits to existing channel posts.
+func IsEditedChannelPost() Filter {
+	return func(u *Update) bool {
+		return u.EditedChannelPost != nil
+	}
+}
+
 // IsText filters updates that look like text,
 // i. e. have some text and do not start with a slash ("/").
 func IsText() Filter {
@@ -26,20 +68,20 @@ func IsText() Filter {
 
 // IsAnyCommand filters updates that look like a command,
 // i. e. have some text and start with a slash ("/").
+// It also filters new message and excludes edited messages, channel posts, callback queries etc.
 func IsAnyCommand() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
-		return message != nil && message.Text != "" && message.Text[0] == '/'
+		return u.Message != nil && u.Message.Text != "" && u.Message.Text[0] == '/'
 	}
 }
 
 // IsCommand filters updates that contain a specific command.
 // For example, IsCommand("start") will handle a "/start" command.
 // This will also allow the user to pass arguments, e. g. "/start foo bar".
+// It also filters new message and excludes edited messages, channel posts, callback queries etc.
 func IsCommand(cmd string) Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
-		return message != nil && (message.Text == "/"+cmd || strings.HasPrefix(message.Text, "/"+cmd))
+		return u.Message != nil && (u.Message.Text == "/"+cmd || strings.HasPrefix(u.Message.Text, "/"+cmd))
 	}
 }
 
@@ -188,41 +230,6 @@ func IsChannel() Filter {
 			return chat.IsChannel()
 		}
 		return false
-	}
-}
-
-// IsInlineQuery filters updates that are callbacks from inline queries.
-func IsInlineQuery() Filter {
-	return func(u *Update) bool {
-		return u.InlineQuery != nil
-	}
-}
-
-// IsCallbackQuery filters updates that are callbacks from button presses.
-func IsCallbackQuery() Filter {
-	return func(u *Update) bool {
-		return u.CallbackQuery != nil
-	}
-}
-
-// IsEditedMessage filters updates that are edits to existing messages.
-func IsEditedMessage() Filter {
-	return func(u *Update) bool {
-		return u.EditedMessage != nil
-	}
-}
-
-// IsChannelPost filters updates that are channel posts.
-func IsChannelPost() Filter {
-	return func(u *Update) bool {
-		return u.ChannelPost != nil
-	}
-}
-
-// EditedChannelPost filters updates that are edits to existing channel posts.
-func IsEditedChannelPost() Filter {
-	return func(u *Update) bool {
-		return u.EditedChannelPost != nil
 	}
 }
 

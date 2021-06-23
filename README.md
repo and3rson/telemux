@@ -159,7 +159,7 @@ See [./examples/album_conversation.go](./examples/album_conversation.go) for a c
 
 ## Getting user/chat/message object from update
 
-When having handlers for wide filters (e. g. `Or(IsText(), IsEditedMessage(), IsInlineQuery())`) you may often fall
+When having handlers for wide filters (e. g. `Or(And(IsText(), IsEditedMessage()), IsInlineQuery())`) you may often fall
 in situations when you need to check for multiple user/chat/message attributes. In such situations sender's data may
 be in one of few places depending on which update has arrived: `u.Message.From`, `u.EditedMessage.From`, or `u.InlineQuery.From`.
 Similar issue applies to fetching actual chat info or message object from an update.
@@ -186,4 +186,29 @@ chat := GetEffectiveChat(u)
 if chat != nil {
     fmt.Println(chat.ID)
 }
+```
+
+## Properly filtering updates
+
+Keep in mind that using content filters such as `IsText()`, `IsPhoto()`, `IsLocation()`, `IsVoice()` etc does not mean
+that the `Update` describes a new message. In fact, an `Update` also happens when a user edits his message!
+Thus your handler will be executed even if a user just edited one of his messages.
+
+To avoid situations like these, make sure to use filters such as `IsMessage()`, `IsEditedMessage()`, `IsCallbackQuery()` etc
+in conjunction with content filters. For example:
+
+```go
+tm.NewHandler(IsText(), func(u *tm.Update) { /* ... */ }) // Will handle new messages, updated messages, channel posts & channel post edits which contain text
+tm.NewHandler(And(IsMessage(), IsText()), func(u *tm.Update) { /* ... */ }) // Will handle new messages that contain text
+tm.NewHandler(And(IsEditedMessage(), IsText()), func(u *tm.Update) { /* ... */ }) // Will handle edited that which contain text
+```
+
+The only exceptions are `IsCommand("...")` and `IsAnyCommand()` filters. Since it does not make sense to react to edited messages that contain
+commands, this filter also checks if the update designates a new message and not an edited message, inline query, callback query etc.
+This means you can safely use `IsCommand("my_command")` without joining it with the `IsMessage()` filter:
+
+```go
+IsCommand("my_command") // OK: IsCommand() already checks for IsMessage()
+And(IsCommand("start"), IsMessage()) // IsMessage() is unnecessary
+And(IsCommand("start"), Not(IsEditedMessage())) // Not(IsEditedMessage()) is unnecessary
 ```
