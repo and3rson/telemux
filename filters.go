@@ -61,7 +61,7 @@ func IsEditedChannelPost() Filter {
 // i. e. have some text and do not start with a slash ("/").
 func IsText() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Text != "" && message.Text[0] != '/'
 	}
 }
@@ -90,7 +90,7 @@ func IsCommand(cmd string) Filter {
 func IsRegex(pattern string) Filter {
 	exp := regexp.MustCompile(pattern)
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && exp.MatchString(message.Text)
 	}
 }
@@ -98,7 +98,7 @@ func IsRegex(pattern string) Filter {
 // IsPhoto filters updates that contain a photo.
 func IsPhoto() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Photo != nil
 	}
 }
@@ -106,7 +106,7 @@ func IsPhoto() Filter {
 // IsVoice filters updates that contain a voice message.
 func IsVoice() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Voice != nil
 	}
 }
@@ -114,7 +114,7 @@ func IsVoice() Filter {
 // IsAudio filters updates that contain an audio.
 func IsAudio() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Audio != nil
 	}
 }
@@ -122,7 +122,7 @@ func IsAudio() Filter {
 // IsAnimation filters updates that contain an animation.
 func IsAnimation() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Animation != nil
 	}
 }
@@ -130,7 +130,7 @@ func IsAnimation() Filter {
 // IsDocument filters updates that contain a document.
 func IsDocument() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Document != nil
 	}
 }
@@ -138,7 +138,7 @@ func IsDocument() Filter {
 // IsSticker filters updates that contain a sticker.
 func Sticker() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Sticker != nil
 	}
 }
@@ -146,7 +146,7 @@ func Sticker() Filter {
 // IsVideo filters updates that contain a video.
 func IsVideo() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Video != nil
 	}
 }
@@ -154,7 +154,7 @@ func IsVideo() Filter {
 // IsVideoNote filters updates that contain a video note.
 func IsVideoNote() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.VideoNote != nil
 	}
 }
@@ -162,7 +162,7 @@ func IsVideoNote() Filter {
 // IsContact filters updates that contain a contact.
 func IsContact() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Contact != nil
 	}
 }
@@ -170,7 +170,7 @@ func IsContact() Filter {
 // IsLocation filters updates that contain a location.
 func IsLocation() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Location != nil
 	}
 }
@@ -178,7 +178,7 @@ func IsLocation() Filter {
 // IsVenue filters updates that contain a venue.
 func IsVenue() Filter {
 	return func(u *Update) bool {
-		message := GetEffectiveMessage(u)
+		message := u.EffectiveMessage()
 		return message != nil && message.Venue != nil
 	}
 }
@@ -186,7 +186,7 @@ func IsVenue() Filter {
 // IsPrivate filters updates that are sent in private chats.
 func IsPrivate() Filter {
 	return func(u *Update) bool {
-		if chat := GetEffectiveChat(u); chat != nil {
+		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsPrivate()
 		}
 		return false
@@ -196,7 +196,7 @@ func IsPrivate() Filter {
 // IsGroup filters updates that are sent in a group. See also IsGroupOrSuperGroup.
 func IsGroup() Filter {
 	return func(u *Update) bool {
-		if chat := GetEffectiveChat(u); chat != nil {
+		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsGroup()
 		}
 		return false
@@ -206,7 +206,7 @@ func IsGroup() Filter {
 // IsSupergroup filters updates that are sent in a superbroup. See also IsGroupOrSuperGroup.
 func IsSuperGroup() Filter {
 	return func(u *Update) bool {
-		if chat := GetEffectiveChat(u); chat != nil {
+		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsSuperGroup()
 		}
 		return false
@@ -216,7 +216,7 @@ func IsSuperGroup() Filter {
 // IsGroupOrSuperGroup filters updates that are sent in both groups and supergroups.
 func IsGroupOrSuperGroup() Filter {
 	return func(u *Update) bool {
-		if chat := GetEffectiveChat(u); chat != nil {
+		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsGroup() || chat.IsSuperGroup()
 		}
 		return false
@@ -226,7 +226,7 @@ func IsGroupOrSuperGroup() Filter {
 // IsChannel filters updates that are sent in channels.
 func IsChannel() Filter {
 	return func(u *Update) bool {
-		if chat := GetEffectiveChat(u); chat != nil {
+		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsChannel()
 		}
 		return false

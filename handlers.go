@@ -1,9 +1,5 @@
 package telemux
 
-import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-)
-
 // Handler defines a function that will handle updates that pass the filtering.
 type Handler struct {
 	Filter Filter
@@ -14,7 +10,7 @@ type Handler struct {
 // This string is used to change conversation state in conversation handlers.
 type TransitionHandler struct {
 	Filter Filter
-	Handle func(u *tgbotapi.Update, data Data) string
+	Handle func(u *Update, data Data) string
 }
 
 // NewHandler creates a new handler.
@@ -45,7 +41,7 @@ func NewConversationHandler(
 ) *Handler {
 	return &Handler{
 		func(u *Update) bool {
-			user, chat := GetEffectiveUser(u), GetEffectiveChat(u)
+			user, chat := u.EffectiveUser(), u.EffectiveChat()
 			pk := PersistenceKey{user.ID, chat.ID}
 			candidates := states[persistence.GetState(conversationID, pk)]
 			if len(defaults) > 0 {
@@ -58,8 +54,8 @@ func NewConversationHandler(
 			}
 			return false
 		},
-		func(u *tgbotapi.Update) {
-			user, chat := GetEffectiveUser(u), GetEffectiveChat(u)
+		func(u *Update) {
+			user, chat := u.EffectiveUser(), u.EffectiveChat()
 			pk := PersistenceKey{user.ID, chat.ID}
 			candidates := states[persistence.GetState(conversationID, pk)]
 			if len(defaults) > 0 {

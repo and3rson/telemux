@@ -93,7 +93,7 @@ func main() {
 		)).
 		AddHandler(tm.NewHandler(
 			tm.IsCallbackQuery(),
-			func(u *tgbotapi.Update) {
+			func(u *tm.Update) {
 				bot.AnswerCallbackQuery(tgbotapi.NewCallback(u.CallbackQuery.ID, "Refreshing..."))
 				bot.Send(tgbotapi.NewEditMessageReplyMarkup(
 					u.CallbackQuery.Message.Chat.ID,

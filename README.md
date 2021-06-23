@@ -157,6 +157,11 @@ See [./examples/album_conversation.go](./examples/album_conversation.go) for a c
 
 # Tips & common pitfalls
 
+## tgbotapi.Update vs tm.Update confusion
+
+Since `Update` struct from go-telegram-bot-api already provides most of the functionality, telemux implements its own `Update` struct
+which embeds the `Update` from go-telegram-bot-api. Main reason for this is to add some extra convenient methods.
+
 ## Getting user/chat/message object from update
 
 When having handlers for wide filters (e. g. `Or(And(IsText(), IsEditedMessage()), IsInlineQuery())`) you may often fall
@@ -164,7 +169,7 @@ in situations when you need to check for multiple user/chat/message attributes. 
 be in one of few places depending on which update has arrived: `u.Message.From`, `u.EditedMessage.From`, or `u.InlineQuery.From`.
 Similar issue applies to fetching actual chat info or message object from an update.
 
-In such cases it's highly recommended to use helper functions from the [helpers](./helpers.go) module:
+In such cases it's highly recommended to use functions such as `EffectiveChat()` (see the [update](./update.go) module for more info):
 
 ```go
 // Bad:
@@ -182,7 +187,7 @@ if u.Message != nil {
 fmt.Println(chatId)
 
 // Best:
-chat := GetEffectiveChat(u)
+chat := u.EffectiveChat()
 if chat != nil {
     fmt.Println(chat.ID)
 }

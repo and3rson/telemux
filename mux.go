@@ -13,9 +13,6 @@ type Mux struct {
 	Handlers []*Handler
 }
 
-// Update is an alias for tgbotapi.Update.
-type Update = tgbotapi.Update
-
 // NewMux creates new Mux.
 func NewMux() *Mux {
 	return &Mux{}
@@ -29,9 +26,10 @@ func (m *Mux) AddHandler(h *Handler) *Mux {
 
 // Dispatch tells Mux to process the update.
 func (m *Mux) Dispatch(u *tgbotapi.Update) bool {
+	uu := Update{u}
 	for _, handler := range m.Handlers {
-		if handler.Filter(u) {
-			handler.Handle(u)
+		if handler.Filter(&uu) {
+			handler.Handle(&uu)
 			return true
 		}
 	}

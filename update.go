@@ -1,9 +1,17 @@
 package telemux
 
-import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+import (
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+)
+
+// Update wraps tgbotapi.Update.
+// It provides some convenient functions such as GetEffectiveUser.
+type Update struct {
+	*tgbotapi.Update
+}
 
 // GetEffectiveUser retrieves user object from update.
-func GetEffectiveUser(u *Update) *tgbotapi.User {
+func (u *Update) EffectiveUser() *tgbotapi.User {
 	if u.Message != nil {
 		return u.Message.From
 	} else if u.EditedMessage != nil {
@@ -23,7 +31,7 @@ func GetEffectiveUser(u *Update) *tgbotapi.User {
 }
 
 // GetEffectiveChat retrieves chat object from update.
-func GetEffectiveChat(u *Update) *tgbotapi.Chat {
+func (u *Update) EffectiveChat() *tgbotapi.Chat {
 	if u.Message != nil {
 		return u.Message.Chat
 	} else if u.EditedMessage != nil {
@@ -39,7 +47,7 @@ func GetEffectiveChat(u *Update) *tgbotapi.Chat {
 }
 
 // GetEffectiveMessage retrieves message object from update.
-func GetEffectiveMessage(u *Update) *tgbotapi.Message {
+func (u *Update) EffectiveMessage() *tgbotapi.Message {
 	if u.Message != nil {
 		return u.Message
 	} else if u.EditedMessage != nil {
