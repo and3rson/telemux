@@ -237,7 +237,7 @@ func IsChannel() Filter {
 func IsNewChatMembers() Filter {
 	return func(u *Update) bool {
 		if message := u.EffectiveMessage(); message != nil {
-			return len(*message.NewChatMembers) > 0
+			return message.NewChatMembers != nil && len(*message.NewChatMembers) > 0
 		}
 		return false
 	}
