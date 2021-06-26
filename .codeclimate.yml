@@ -1,2 +1,11 @@
 exclude_patterns:
   - "examples/"
+checks:
+  nested-control-flow:
+    enabled: true
+    config:
+      threshold: 10
+  return-statements:
+    enabled: true
+    config:
+      threshold: 10

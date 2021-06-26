@@ -32,31 +32,22 @@ func (u *Update) EffectiveUser() *tgbotapi.User {
 
 // GetEffectiveChat retrieves chat object from update.
 func (u *Update) EffectiveChat() *tgbotapi.Chat {
-	if u.Message != nil {
-		return u.Message.Chat
-	} else if u.EditedMessage != nil {
-		return u.EditedMessage.Chat
-	} else if u.ChannelPost != nil {
-		return u.ChannelPost.Chat
-	} else if u.EditedChannelPost != nil {
-		return u.EditedChannelPost.Chat
-	} else if u.CallbackQuery != nil && u.CallbackQuery.Message != nil {
-		return u.CallbackQuery.Message.Chat
+	message := u.EffectiveMessage()
+	if message != nil {
+		return message.Chat
 	}
 	return nil
 }
 
 // GetEffectiveMessage retrieves message object from update.
 func (u *Update) EffectiveMessage() *tgbotapi.Message {
-	if u.Message != nil {
-		return u.Message
-	} else if u.EditedMessage != nil {
-		return u.EditedMessage
-	} else if u.ChannelPost != nil {
-		return u.ChannelPost
-	} else if u.EditedChannelPost != nil {
-		return u.EditedChannelPost
-	} else if u.CallbackQuery != nil {
+	candidates := []*tgbotapi.Message{u.Message, u.EditedMessage, u.ChannelPost, u.EditedChannelPost}
+	for _, message := range candidates {
+		if message != nil {
+			return message
+		}
+	}
+	if u.CallbackQuery != nil {
 		return u.CallbackQuery.Message
 	}
 	return nil
