@@ -63,7 +63,7 @@ func main() {
 
 	mux := tm.NewMux().
 		AddHandler(tm.NewHandler(
-			tm.IsCommand("start"),
+			tm.IsCommandMessage("start"),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
 					u.Message.Chat.ID,
@@ -72,7 +72,7 @@ func main() {
 			},
 		)).
 		AddHandler(tm.NewHandler(
-			tm.IsCommand("cat"),
+			tm.IsCommandMessage("cat"),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewChatAction(u.Message.Chat.ID, tgbotapi.ChatTyping))
 				url, err := GetRandomCatURL()

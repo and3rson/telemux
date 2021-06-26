@@ -25,7 +25,7 @@ func main() {
 	}
 	mux := tm.NewMux().
 		AddHandler(tm.NewHandler(
-			tm.And(tm.IsPrivate(), tm.IsCommand("start")),
+			tm.And(tm.IsPrivate(), tm.IsCommandMessage("start")),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
 					u.Message.Chat.ID,
@@ -34,7 +34,7 @@ func main() {
 			},
 		)).
 		AddHandler(tm.NewHandler(
-			tm.IsCommand("start"),
+			tm.IsCommandMessage("start"),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewMessage(
 					u.Message.Chat.ID,

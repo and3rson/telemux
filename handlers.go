@@ -15,11 +15,17 @@ type TransitionHandler struct {
 
 // NewHandler creates a new handler.
 func NewHandler(filter Filter, handle func(u *Update)) *Handler {
+	if filter == nil {
+		filter = Any()
+	}
 	return &Handler{filter, handle}
 }
 
 // NewTransitionHandler creates a new transition handler for a conversation handler.
 func NewTransitionHandler(filter Filter, handle func(u *Update, data Data) string) *TransitionHandler {
+	if filter == nil {
+		filter = Any()
+	}
 	return &TransitionHandler{filter, handle}
 }
 

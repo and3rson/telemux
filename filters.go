@@ -50,44 +50,44 @@ func IsChannelPost() Filter {
 	}
 }
 
-// EditedChannelPost filters updates that are edits to existing channel posts.
+// IsEditedChannelPost filters updates that are edits to existing channel posts.
 func IsEditedChannelPost() Filter {
 	return func(u *Update) bool {
 		return u.EditedChannelPost != nil
 	}
 }
 
-// IsText filters updates that look like text,
+// HasText filters updates that look like text,
 // i. e. have some text and do not start with a slash ("/").
-func IsText() Filter {
+func HasText() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Text != "" && message.Text[0] != '/'
 	}
 }
 
-// IsAnyCommand filters updates that look like a command,
+// IsAnyCommandMessage filters updates that look like a command,
 // i. e. have some text and start with a slash ("/").
 // It also filters new message and excludes edited messages, channel posts, callback queries etc.
-func IsAnyCommand() Filter {
+func IsAnyCommandMessage() Filter {
 	return func(u *Update) bool {
 		return u.Message != nil && u.Message.Text != "" && u.Message.Text[0] == '/'
 	}
 }
 
-// IsCommand filters updates that contain a specific command.
-// For example, IsCommand("start") will handle a "/start" command.
+// IsCommandMessage filters updates that contain a specific command.
+// For example, IsCommandMessage("start") will handle a "/start" command.
 // This will also allow the user to pass arguments, e. g. "/start foo bar".
-// It also filters new message and excludes edited messages, channel posts, callback queries etc.
-func IsCommand(cmd string) Filter {
+// It also filters only new messages (edited messages, channel posts, callback queries etc are all excluded.)
+func IsCommandMessage(cmd string) Filter {
 	return func(u *Update) bool {
 		return u.Message != nil && (u.Message.Text == "/"+cmd || strings.HasPrefix(u.Message.Text, "/"+cmd))
 	}
 }
 
-// IsRegex filters updates that match a regular expression.
-// For example, IsRegex("^/get_(\d+)$") will handle commands like "/get_42".
-func IsRegex(pattern string) Filter {
+// HasRegex filters updates that match a regular expression.
+// For example, HasRegex("^/get_(\d+)$") will handle commands like "/get_42".
+func HasRegex(pattern string) Filter {
 	exp := regexp.MustCompile(pattern)
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
@@ -95,88 +95,88 @@ func IsRegex(pattern string) Filter {
 	}
 }
 
-// IsPhoto filters updates that contain a photo.
-func IsPhoto() Filter {
+// HasPhoto filters updates that contain a photo.
+func HasPhoto() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Photo != nil
 	}
 }
 
-// IsVoice filters updates that contain a voice message.
-func IsVoice() Filter {
+// HasVoice filters updates that contain a voice message.
+func HasVoice() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Voice != nil
 	}
 }
 
-// IsAudio filters updates that contain an audio.
-func IsAudio() Filter {
+// HasAudio filters updates that contain an audio.
+func HasAudio() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Audio != nil
 	}
 }
 
-// IsAnimation filters updates that contain an animation.
-func IsAnimation() Filter {
+// HasAnimation filters updates that contain an animation.
+func HasAnimation() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Animation != nil
 	}
 }
 
-// IsDocument filters updates that contain a document.
-func IsDocument() Filter {
+// HasDocument filters updates that contain a document.
+func HasDocument() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Document != nil
 	}
 }
 
-// IsSticker filters updates that contain a sticker.
-func Sticker() Filter {
+// HasSticker filters updates that contain a sticker.
+func HasSticker() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Sticker != nil
 	}
 }
 
-// IsVideo filters updates that contain a video.
-func IsVideo() Filter {
+// HasVideo filters updates that contain a video.
+func HasVideo() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Video != nil
 	}
 }
 
-// IsVideoNote filters updates that contain a video note.
-func IsVideoNote() Filter {
+// HasVideoNote filters updates that contain a video note.
+func HasVideoNote() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.VideoNote != nil
 	}
 }
 
-// IsContact filters updates that contain a contact.
-func IsContact() Filter {
+// HasContact filters updates that contain a contact.
+func HasContact() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Contact != nil
 	}
 }
 
-// IsLocation filters updates that contain a location.
-func IsLocation() Filter {
+// HasLocation filters updates that contain a location.
+func HasLocation() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Location != nil
 	}
 }
 
-// IsVenue filters updates that contain a venue.
-func IsVenue() Filter {
+// HasVenue filters updates that contain a venue.
+func HasVenue() Filter {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Venue != nil

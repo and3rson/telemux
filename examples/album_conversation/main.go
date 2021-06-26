@@ -42,7 +42,7 @@ func main() {
 			tm.NewLocalPersistence(),
 			map[string][]*tm.TransitionHandler{
 				"": {
-					tm.NewTransitionHandler(tm.IsCommand("add"), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.IsCommandMessage("add"), func(u *tm.Update, data tm.Data) string {
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
 							"Please send me your photo.",
@@ -51,7 +51,7 @@ func main() {
 					}),
 				},
 				"upload_photo": {
-					tm.NewTransitionHandler(tm.IsPhoto(), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.HasPhoto(), func(u *tm.Update, data tm.Data) string {
 						data["photoID"] = (*u.Message.Photo)[0].FileID
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
@@ -59,7 +59,7 @@ func main() {
 						))
 						return "enter_description"
 					}),
-					tm.NewTransitionHandler(tm.Not(tm.IsAnyCommand()), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.Not(tm.IsAnyCommandMessage()), func(u *tm.Update, data tm.Data) string {
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
 							"Sorry, I only accept photos. Please try again!",
@@ -68,7 +68,7 @@ func main() {
 					}),
 				},
 				"enter_description": {
-					tm.NewTransitionHandler(tm.IsText(), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, data tm.Data) string {
 						data["photoDescription"] = u.Message.Text
 						msg := tgbotapi.NewMessage(u.Message.Chat.ID, "Are you sure you want to save this photo?")
 						msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
@@ -82,7 +82,7 @@ func main() {
 					}),
 				},
 				"confirm_submission": {
-					tm.NewTransitionHandler(tm.IsText(), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, data tm.Data) string {
 						var msg tgbotapi.MessageConfig
 						if u.Message.Text == "Yes" {
 							lastID += 1
@@ -102,14 +102,14 @@ func main() {
 				},
 			},
 			[]*tm.TransitionHandler{
-				tm.NewTransitionHandler(tm.IsCommand("cancel"), func(u *tm.Update, data tm.Data) string {
+				tm.NewTransitionHandler(tm.IsCommandMessage("cancel"), func(u *tm.Update, data tm.Data) string {
 					bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Cancelled."))
 					return ""
 				}),
 			},
 		)).
 		AddHandler(tm.NewHandler(
-			tm.IsCommand("list"),
+			tm.IsCommandMessage("list"),
 			func(u *tm.Update) {
 				var lines []string
 				for _, photo := range photos {
@@ -127,7 +127,7 @@ func main() {
 			},
 		)).
 		AddHandler(tm.NewHandler(
-			tm.IsRegex(`^/view_(\d+)$`),
+			tm.HasRegex(`^/view_(\d+)$`),
 			func(u *tm.Update) {
 				photoID := strings.Split(u.Message.Text, "_")[1]
 				var match *Photo

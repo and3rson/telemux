@@ -19,9 +19,9 @@ This project is in early beta stage. Contributions are welcome! Feel free to sub
 - Extension for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library, meaning you'll still use all of its features
 - Designed with statelessness in mind
 - Extensible handler configuration inspired by [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library
-- Conversations (aka Dialogs) based on finite-state machines (see [./examples/album_conversation.go](./examples/album_conversation.go))
-- Pluggable persistence for conversations. E. g. you can use database to store the intermediate values of some conversation (see [./examples/album_conversation.go](./examples/album_conversation.go) and [./persistence.go](./persistence.go))
-- Flexible handler filtering. E. g. `And(Or(IsText(), IsPhoto()), IsPrivate())` will only accept direct messages containing photo or text (see [./filters.go](./filters.go))
+- Conversations (aka Dialogs) based on finite-state machines (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go))
+- Pluggable persistence for conversations. E. g. you can use database to store the intermediate values of some conversation (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go) and [./persistence.go](./persistence.go))
+- Flexible handler filtering. E. g. `And(Or(HasText(), HasPhoto()), IsPrivate())` will only accept direct messages containing photo or text (see [./filters.go](./filters.go))
 
 # Minimal example
 
@@ -47,7 +47,7 @@ func main() {
     // If a handler cannot handle the update (fails the filter), multiplexer will proceed to the next handler.
     mux := tm.NewMux().
         AddHandler(tm.NewHandler(
-            tm.IsCommand("start"),
+            tm.IsCommandMessage("start"),
             func(u *tm.Update) {
                 bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Hello! I'm a simple bot who repeats everything you say. :)"))
             },
@@ -98,22 +98,26 @@ Handler consists of filter and handle-function.
 Handler's filter decides whether this handler can handle the incoming update.
 If so, handle-function is called. Otherwise multiplexer will proceed to the next handler.
 
-There are some built-in filters such as `IsPhoto`, `IsPrivate` etc.
-They can also be chained using `And`, `Or`, and `Not`. For example:
+Filters are divided in two groups: content filters (starting with "Has", such as `HasPhoto()`, `HasAudio()`, `HasSticker()` etc)
+and update type filters (starting with "Os", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
+
+There is also a special filter `Any()` which makes handler accept all updates.
+
+Filters can be chained using `And`, `Or`, and `Not` meta-filters. For example:
 
 ```go
 mux := tm.NewMux()
 
 // Add handler that accepts photos sent to the bot in a private chat:
-mux.AddHandler(And(tm.IsPrivate(), tm.IsPhoto()), func(u *tm.Update) { /* ... */ })
+mux.AddHandler(And(tm.IsPrivate(), tm.HasPhoto()), func(u *tm.Update) { /* ... */ })
 
-// Add handler that accepts bot photos and test messages:
-mux.AddHandler(Or(tm.IsText(), tm.IsPhoto()), func(u *tm.Update) { /* ... */ })
+// Add handler that accepts photos and text messages:
+mux.AddHandler(Or(tm.HasText(), tm.HasPhoto()), func(u *tm.Update) { /* ... */ })
 
 // Since filters are plain functions, you can easily implement them yourself.
 // Below we add handler that allows onle a specific user to call "/restart" command:
 mux.AddHandler(tm.NewHandler(
-    tm.And(tm.IsCommand("restart"), func(u *tm.Update) bool {
+    tm.And(tm.IsCommandMessage("restart"), func(u *tm.Update) bool {
         return u.Message.From.ID == 3442691337
     }),
     func(u *tm.Update) { /* ... */ },
@@ -153,7 +157,7 @@ To create a ConversationHandler you need to provide the following:
 
     Useful to handle commands such as "/cancel" or to display some default message.
 
-See [./examples/album_conversation.go](./examples/album_conversation.go) for a conversation example.
+See [./examples/album_conversation/main.go](./examples/album_conversation/main.go) for a conversation example.
 
 # Tips & common pitfalls
 
@@ -164,7 +168,7 @@ which embeds the `Update` from go-telegram-bot-api. Main reason for this is to a
 
 ## Getting user/chat/message object from update
 
-When having handlers for wide filters (e. g. `Or(And(IsText(), IsEditedMessage()), IsInlineQuery())`) you may often fall
+When having handlers for wide filters (e. g. `Or(And(HasText(), IsEditedMessage()), IsInlineQuery())`) you may often fall
 in situations when you need to check for multiple user/chat/message attributes. In such situations sender's data may
 be in one of few places depending on which update has arrived: `u.Message.From`, `u.EditedMessage.From`, or `u.InlineQuery.From`.
 Similar issue applies to fetching actual chat info or message object from an update.
@@ -195,25 +199,25 @@ if chat != nil {
 
 ## Properly filtering updates
 
-Keep in mind that using content filters such as `IsText()`, `IsPhoto()`, `IsLocation()`, `IsVoice()` etc does not mean
-that the `Update` describes a new message. In fact, an `Update` also happens when a user edits his message!
+Keep in mind that using content filters such as `HasText()`, `HasPhoto()`, `HasLocation()`, `HasVoice()` etc does not guarantee
+that the `Update` describes an actual new message. In fact, an `Update` also happens when a user edits his message!
 Thus your handler will be executed even if a user just edited one of his messages.
 
 To avoid situations like these, make sure to use filters such as `IsMessage()`, `IsEditedMessage()`, `IsCallbackQuery()` etc
 in conjunction with content filters. For example:
 
 ```go
-tm.NewHandler(IsText(), func(u *tm.Update) { /* ... */ }) // Will handle new messages, updated messages, channel posts & channel post edits which contain text
-tm.NewHandler(And(IsMessage(), IsText()), func(u *tm.Update) { /* ... */ }) // Will handle new messages that contain text
-tm.NewHandler(And(IsEditedMessage(), IsText()), func(u *tm.Update) { /* ... */ }) // Will handle edited that which contain text
+tm.NewHandler(HasText(), func(u *tm.Update) { /* ... */ }) // Will handle new messages, updated messages, channel posts & channel post edits which contain text
+tm.NewHandler(And(IsMessage(), HasText()), func(u *tm.Update) { /* ... */ }) // Will handle new messages that contain text
+tm.NewHandler(And(IsEditedMessage(), HasText()), func(u *tm.Update) { /* ... */ }) // Will handle edited that which contain text
 ```
 
-The only exceptions are `IsCommand("...")` and `IsAnyCommand()` filters. Since it does not make sense to react to edited messages that contain
+The only exceptions are `IsCommandMessage("...")` and `IsAnyCommandMessage()` filters. Since it does not make sense to react to edited messages that contain
 commands, this filter also checks if the update designates a new message and not an edited message, inline query, callback query etc.
-This means you can safely use `IsCommand("my_command")` without joining it with the `IsMessage()` filter:
+This means you can safely use `IsCommandMessage("my_command")` without joining it with the `IsMessage()` filter:
 
 ```go
-IsCommand("my_command") // OK: IsCommand() already checks for IsMessage()
-And(IsCommand("start"), IsMessage()) // IsMessage() is unnecessary
-And(IsCommand("start"), Not(IsEditedMessage())) // Not(IsEditedMessage()) is unnecessary
+IsCommandMessage("my_command") // OK: IsCommand() already checks for IsMessage()
+And(IsCommandMessage("start"), IsMessage()) // IsMessage() is unnecessary
+And(IsCommandMessage("start"), Not(IsEditedMessage())) // Not(IsEditedMessage()) is unnecessary
 ```
