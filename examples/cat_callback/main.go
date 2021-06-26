@@ -118,7 +118,7 @@ func main() {
 					u.CallbackQuery.Message.MessageID,
 					url,
 				)
-				edit.ReplyMarkup = &refresh_markup
+				edit.ReplyMarkup = &refreshMarkup
 				bot.Send(edit)
 			},
 		))
