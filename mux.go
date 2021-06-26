@@ -1,4 +1,4 @@
-// telemux is a flexible message router add-on for "go-telegram-bot-api".
+// Package telemux is a flexible message router add-on for "go-telegram-bot-api".
 //
 // Make sure to check "go-telegram-bot-api" documentation first:
 // https://github.com/go-telegram-bot-api/telegram-bot-api

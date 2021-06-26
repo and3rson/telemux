@@ -203,7 +203,7 @@ func IsGroup() Filter {
 	}
 }
 
-// IsSupergroup filters updates that are sent in a superbroup. See also IsGroupOrSuperGroup.
+// IsSuperGroup filters updates that are sent in a superbroup. See also IsGroupOrSuperGroup.
 func IsSuperGroup() Filter {
 	return func(u *Update) bool {
 		if chat := u.EffectiveChat(); chat != nil {

@@ -12,6 +12,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+// Photo describes a submitted photo
 type Photo struct {
 	ID          int
 	FileID      string
@@ -85,7 +86,7 @@ func main() {
 					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, data tm.Data) string {
 						var msg tgbotapi.MessageConfig
 						if u.Message.Text == "Yes" {
-							lastID += 1
+							lastID++
 							photos = append(photos, Photo{
 								lastID,
 								data["photoID"].(string),

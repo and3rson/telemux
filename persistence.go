@@ -13,7 +13,7 @@ import (
 // Data is an alias for map[string]interface{}.
 type Data = map[string]interface{}
 
-// Persistence interface tells conversation where to store & how to retrieve the current state of the conversation,
+// ConversationPersistence interface tells conversation where to store & how to retrieve the current state of the conversation,
 // i. e. which "step" the given user is currently at.
 type ConversationPersistence interface {
 	// GetState & SetState tell conversation handlers how to retrieve & set conversation state.
@@ -36,10 +36,12 @@ func (k PersistenceKey) String() string {
 	return fmt.Sprintf("%s:%d:%d", k.ConversationID, k.UserID, k.ChatID)
 }
 
+// MarshalText marshals persistence for use in map keys
 func (k PersistenceKey) MarshalText() ([]byte, error) {
 	return []byte(k.String()), nil
 }
 
+// UnmarshalText unmarshals persistence from "CONV:USER:CHAT" string
 func (k *PersistenceKey) UnmarshalText(b []byte) error {
 	parts := strings.Split(string(b), ":")
 	chatIDstr := parts[len(parts)-1]
@@ -78,6 +80,7 @@ func NewLocalPersistence() *LocalPersistence {
 	}
 }
 
+// GetState returns conversation state from memory
 func (p *LocalPersistence) GetState(pk PersistenceKey) string {
 	state, ok := p.States[pk]
 	if !ok {
@@ -86,10 +89,12 @@ func (p *LocalPersistence) GetState(pk PersistenceKey) string {
 	return state
 }
 
+// SetState stores conversation state in memory
 func (p *LocalPersistence) SetState(pk PersistenceKey, state string) {
 	p.States[pk] = state
 }
 
+// GetConversationData returns conversation data from memory
 func (p *LocalPersistence) GetConversationData(pk PersistenceKey) Data {
 	data, ok := p.Data[pk]
 	if !ok {
@@ -99,6 +104,7 @@ func (p *LocalPersistence) GetConversationData(pk PersistenceKey) Data {
 	return data
 }
 
+// SetConversationData stores conversation data in memory
 func (p *LocalPersistence) SetConversationData(pk PersistenceKey, data Data) {
 	p.Data[pk] = data
 }
@@ -157,6 +163,7 @@ func (p *FilePersistence) writeContent(content *filePersistenceContent) {
 	}
 }
 
+// GetState reads conversation state from file
 func (p *FilePersistence) GetState(pk PersistenceKey) string {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -168,6 +175,7 @@ func (p *FilePersistence) GetState(pk PersistenceKey) string {
 	return state
 }
 
+// SetState writes conversation state to file
 func (p *FilePersistence) SetState(pk PersistenceKey, state string) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -176,6 +184,7 @@ func (p *FilePersistence) SetState(pk PersistenceKey, state string) {
 	p.writeContent(content)
 }
 
+// GetConversationData reads conversation data from file
 func (p *FilePersistence) GetConversationData(pk PersistenceKey) Data {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
@@ -187,6 +196,7 @@ func (p *FilePersistence) GetConversationData(pk PersistenceKey) Data {
 	return data
 }
 
+// SetConversationData writes conversation data to file
 func (p *FilePersistence) SetConversationData(pk PersistenceKey, data Data) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()

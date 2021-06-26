@@ -1,12 +1,16 @@
 TAG=$(shell git describe --tags --always)
 
-all: | test vet
+all: | test vet lint
 
 test:
 	go test ./...
 
 vet:
 	go vet ./...
+
+lint:
+	cd /tmp && go get golang.org/x/lint/golint
+	golint ./...
 
 announce:
 	GOPROXY=proxy.golang.org go list -m github.com/and3rson/telemux@${TAG}

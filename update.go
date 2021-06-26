@@ -10,7 +10,7 @@ type Update struct {
 	tgbotapi.Update
 }
 
-// GetEffectiveUser retrieves user object from update.
+// EffectiveUser retrieves user object from update.
 func (u *Update) EffectiveUser() *tgbotapi.User {
 	if u.Message != nil {
 		return u.Message.From
@@ -30,7 +30,7 @@ func (u *Update) EffectiveUser() *tgbotapi.User {
 	return nil
 }
 
-// GetEffectiveChat retrieves chat object from update.
+// EffectiveChat retrieves chat object from update.
 func (u *Update) EffectiveChat() *tgbotapi.Chat {
 	message := u.EffectiveMessage()
 	if message != nil {
@@ -39,7 +39,7 @@ func (u *Update) EffectiveChat() *tgbotapi.Chat {
 	return nil
 }
 
-// GetEffectiveMessage retrieves message object from update.
+// EffectiveMessage retrieves message object from update.
 func (u *Update) EffectiveMessage() *tgbotapi.Message {
 	candidates := []*tgbotapi.Message{u.Message, u.EditedMessage, u.ChannelPost, u.EditedChannelPost}
 	for _, message := range candidates {

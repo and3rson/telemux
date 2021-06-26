@@ -13,6 +13,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+// CatInfo describes cat picture
 type CatInfo struct {
 	ID     string `json:"id"`
 	URL    string `json:"url"`
@@ -20,6 +21,7 @@ type CatInfo struct {
 	Height int    `json:"height"`
 }
 
+// GetRandomCatURL fetches a photo of a random cat
 func GetRandomCatURL() (string, error) {
 	resp, err := http.Get("https://api.thecatapi.com/v1/images/search?mime_types=jpg")
 	if err != nil {
@@ -27,6 +29,9 @@ func GetRandomCatURL() (string, error) {
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
 	var catInfos []CatInfo
 	if err := json.Unmarshal(data, &catInfos); err != nil {
 		return "", err
@@ -50,12 +55,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	loading_markup := tgbotapi.NewInlineKeyboardMarkup(
+	loadingMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Loading...", "refresh"),
 		),
 	)
-	refresh_markup := tgbotapi.NewInlineKeyboardMarkup(
+	refreshMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Another image", "refresh"),
 		),
@@ -79,7 +84,7 @@ func main() {
 				if err != nil {
 					bot.Send(tgbotapi.NewMessage(
 						u.Message.Chat.ID,
-						fmt.Sprintf("Oops, an error occured: %s", err),
+						fmt.Sprintf("Oops, an error occurred: %s", err),
 					))
 					return
 				}
@@ -87,7 +92,7 @@ func main() {
 					u.Message.Chat.ID,
 					url,
 				)
-				message.ReplyMarkup = refresh_markup
+				message.ReplyMarkup = refreshMarkup
 				bot.Send(message)
 			},
 		)).
@@ -98,14 +103,14 @@ func main() {
 				bot.Send(tgbotapi.NewEditMessageReplyMarkup(
 					u.CallbackQuery.Message.Chat.ID,
 					u.CallbackQuery.Message.MessageID,
-					loading_markup,
+					loadingMarkup,
 				))
 				bot.Send(tgbotapi.NewChatAction(u.CallbackQuery.Message.Chat.ID, tgbotapi.ChatTyping))
 				url, err := GetRandomCatURL()
 				if err != nil {
 					bot.Send(tgbotapi.NewMessage(
 						u.Message.Chat.ID,
-						fmt.Sprintf("Oops, an error occured: %s", err),
+						fmt.Sprintf("Oops, an error occurred: %s", err),
 					))
 				}
 				edit := tgbotapi.NewEditMessageText(

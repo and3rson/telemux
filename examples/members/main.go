@@ -12,10 +12,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+// KnownGroups contains list of groups that bot can be invited to
 type KnownGroups struct {
 	ids []int64
 }
 
+// LoadFromEnv reads known groups from env var
 func (k KnownGroups) LoadFromEnv() {
 	for _, idStr := range strings.Split(os.Getenv("KNOWN_GROUPS"), ",") {
 		id, err := strconv.ParseInt(idStr, 10, 64)
@@ -26,6 +28,7 @@ func (k KnownGroups) LoadFromEnv() {
 	}
 }
 
+// IsKnownGroup checks if groups is known
 func (k KnownGroups) IsKnownGroup(id int64) bool {
 	for _, otherID := range k.ids {
 		if id == otherID {

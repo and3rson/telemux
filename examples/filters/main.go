@@ -10,14 +10,6 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-type Photo struct {
-	ID          int
-	FileID      string
-	Description string
-}
-
-var lastID = 0
-
 func main() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TG_TOKEN"))
 	if err != nil {
