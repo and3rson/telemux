@@ -44,12 +44,13 @@ func main() {
     updates, _ := bot.GetUpdatesChan(u)
 
     // Create a multiplexer with two handlers: one for command and one for all messages.
-    // If a handler cannot handle the update (fails the filter), multiplexer will proceed to the next handler.
+    // If a handler cannot handle the update (fails the filter),
+    // multiplexer will proceed to the next handler.
     mux := tm.NewMux().
         AddHandler(tm.NewHandler(
             tm.IsCommandMessage("start"),
             func(u *tm.Update) {
-                bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Hello! I'm a simple bot who repeats everything you say. :)"))
+                bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Hello! Say something. :)"))
             },
         )).
         AddHandler(tm.NewHandler(
@@ -60,7 +61,7 @@ func main() {
         ))
     // Dispatch all telegram updates to multiplexer
     for update := range updates {
-        mux.Dispatch(&update)
+        mux.Dispatch(update)
     }
 }
 ```
@@ -87,7 +88,7 @@ mux := tm.NewMux()
 // ...
 updates, _ := bot.GetUpdatesChan(u)
 for update := range updates {
-    mux.Dispatch(&update)
+    mux.Dispatch(update)
 }
 ```
 

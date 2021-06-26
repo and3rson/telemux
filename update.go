@@ -7,7 +7,7 @@ import (
 // Update wraps tgbotapi.Update.
 // It provides some convenient functions such as GetEffectiveUser.
 type Update struct {
-	*tgbotapi.Update
+	tgbotapi.Update
 }
 
 // GetEffectiveUser retrieves user object from update.

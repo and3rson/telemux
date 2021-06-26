@@ -25,7 +25,7 @@ func (m *Mux) AddHandler(h *Handler) *Mux {
 }
 
 // Dispatch tells Mux to process the update.
-func (m *Mux) Dispatch(u *tgbotapi.Update) bool {
+func (m *Mux) Dispatch(u tgbotapi.Update) bool {
 	uu := Update{u}
 	for _, handler := range m.Handlers {
 		if handler.Filter(&uu) {
