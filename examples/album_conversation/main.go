@@ -39,7 +39,7 @@ func main() {
 	mux := tm.NewMux().
 		AddHandler(tm.NewConversationHandler(
 			"upload_photo_dialog",
-			tm.NewLocalPersistence(),
+			tm.NewLocalPersistence(), // we could also use `tm.NewFilePersistence("db.json"),` to keep data across bot restarts
 			map[string][]*tm.TransitionHandler{
 				"": {
 					tm.NewTransitionHandler(tm.IsCommandMessage("add"), func(u *tm.Update, data tm.Data) string {
@@ -95,6 +95,9 @@ func main() {
 						} else {
 							msg = tgbotapi.NewMessage(u.Message.Chat.ID, "Cancelled.")
 						}
+						for k := range data {
+							delete(data, k)
+						}
 						msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 						bot.Send(msg)
 						return ""
@@ -103,6 +106,9 @@ func main() {
 			},
 			[]*tm.TransitionHandler{
 				tm.NewTransitionHandler(tm.IsCommandMessage("cancel"), func(u *tm.Update, data tm.Data) string {
+					for k := range data {
+						delete(data, k)
+					}
 					bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Cancelled."))
 					return ""
 				}),

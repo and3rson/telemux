@@ -48,8 +48,8 @@ func NewConversationHandler(
 	return &Handler{
 		func(u *Update) bool {
 			user, chat := u.EffectiveUser(), u.EffectiveChat()
-			pk := PersistenceKey{user.ID, chat.ID}
-			candidates := states[persistence.GetState(conversationID, pk)]
+			pk := PersistenceKey{conversationID, user.ID, chat.ID}
+			candidates := states[persistence.GetState(pk)]
 			if len(defaults) > 0 {
 				candidates = append(candidates, defaults...)
 			}
@@ -62,16 +62,16 @@ func NewConversationHandler(
 		},
 		func(u *Update) {
 			user, chat := u.EffectiveUser(), u.EffectiveChat()
-			pk := PersistenceKey{user.ID, chat.ID}
-			candidates := states[persistence.GetState(conversationID, pk)]
+			pk := PersistenceKey{conversationID, user.ID, chat.ID}
+			candidates := states[persistence.GetState(pk)]
 			if len(defaults) > 0 {
 				candidates = append(candidates, defaults...)
 			}
 			for _, handler := range candidates {
 				if handler.Filter(u) {
-					data := persistence.GetConversationData(conversationID, pk)
-					persistence.SetState(conversationID, pk, handler.Handle(u, data))
-					persistence.SetConversationData(conversationID, pk, data)
+					data := persistence.GetConversationData(pk)
+					persistence.SetState(pk, handler.Handle(u, data))
+					persistence.SetConversationData(pk, data)
 					return
 				}
 			}

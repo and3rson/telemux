@@ -20,7 +20,7 @@ This project is in early beta stage. Contributions are welcome! Feel free to sub
 - Designed with statelessness in mind
 - Extensible handler configuration inspired by [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library
 - Conversations (aka Dialogs) based on finite-state machines (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go))
-- Pluggable persistence for conversations. E. g. you can use database to store the intermediate values of some conversation (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go) and [./persistence.go](./persistence.go))
+- Pluggable persistence for conversations. E. g. you can use database to store the states & intermediate values of conversations (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go) and [./persistence.go](./persistence.go))
 - Flexible handler filtering. E. g. `And(Or(HasText(), HasPhoto()), IsPrivate())` will only accept direct messages containing photo or text (see [./filters.go](./filters.go))
 
 # Minimal example
