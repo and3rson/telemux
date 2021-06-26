@@ -1,4 +1,4 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/and3rson/telemux.svg)](https://pkg.go.dev/github.com/and3rson/telemux)
+[![Go Reference](https://pkg.go.dev/badge/github.com/and3rson/telemux.svg)](https://pkg.go.dev/github.com/and3rson/telemux) [![Build Status](https://travis-ci.com/and3rson/telemux.svg?branch=main)](https://travis-ci.com/and3rson/telemux) [![Maintainability](https://api.codeclimate.com/v1/badges/63d82ddd3151594c3765/maintainability)](https://codeclimate.com/github/and3rson/telemux/maintainability)
 
 # telemux
 Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library
