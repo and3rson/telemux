@@ -76,7 +76,7 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.NewHandler(
+		AddHandler(tm.NewAsyncHandler(
 			tm.IsCommandMessage("cat"),
 			func(u *tm.Update) {
 				bot.Send(tgbotapi.NewChatAction(u.Message.Chat.ID, tgbotapi.ChatTyping))
@@ -96,7 +96,7 @@ func main() {
 				bot.Send(message)
 			},
 		)).
-		AddHandler(tm.NewHandler(
+		AddHandler(tm.NewAsyncHandler(
 			tm.IsCallbackQuery(),
 			func(u *tm.Update) {
 				bot.AnswerCallbackQuery(tgbotapi.NewCallback(u.CallbackQuery.ID, "Refreshing..."))

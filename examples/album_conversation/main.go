@@ -43,34 +43,37 @@ func main() {
 			tm.NewLocalPersistence(), // we could also use `tm.NewFilePersistence("db.json"),` to keep data across bot restarts
 			map[string][]*tm.TransitionHandler{
 				"": {
-					tm.NewTransitionHandler(tm.IsCommandMessage("add"), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.IsCommandMessage("add"), func(u *tm.Update, ctx *tm.PersistenceContext) {
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
 							"Please send me your photo.",
 						))
-						return "upload_photo"
+						ctx.SetState("upload_photo")
 					}),
 				},
 				"upload_photo": {
-					tm.NewTransitionHandler(tm.HasPhoto(), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.HasPhoto(), func(u *tm.Update, ctx *tm.PersistenceContext) {
+						data := ctx.GetData()
 						data["photoID"] = (*u.Message.Photo)[0].FileID
+						ctx.SetData(data)
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
 							"Please enter photo description.",
 						))
-						return "enter_description"
+						ctx.SetState("enter_description")
 					}),
-					tm.NewTransitionHandler(tm.Not(tm.IsAnyCommandMessage()), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.Not(tm.IsCommandMessage("cancel")), func(u *tm.Update, ctx *tm.PersistenceContext) {
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
 							"Sorry, I only accept photos. Please try again!",
 						))
-						return "upload_photo"
 					}),
 				},
 				"enter_description": {
-					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, ctx *tm.PersistenceContext) {
+						data := ctx.GetData()
 						data["photoDescription"] = u.Message.Text
+						ctx.SetData(data)
 						msg := tgbotapi.NewMessage(u.Message.Chat.ID, "Are you sure you want to save this photo?")
 						msg.ReplyMarkup = tgbotapi.NewReplyKeyboard(
 							tgbotapi.NewKeyboardButtonRow(
@@ -79,11 +82,18 @@ func main() {
 							),
 						)
 						bot.Send(msg)
-						return "confirm_submission"
+						ctx.SetState("confirm_submission")
+					}),
+					tm.NewTransitionHandler(tm.Not(tm.IsCommandMessage("cancel")), func(u *tm.Update, ctx *tm.PersistenceContext) {
+						bot.Send(tgbotapi.NewMessage(
+							u.Message.Chat.ID,
+							"Sorry, I did not understand that. Please enter some text!",
+						))
 					}),
 				},
 				"confirm_submission": {
-					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, data tm.Data) string {
+					tm.NewTransitionHandler(tm.HasText(), func(u *tm.Update, ctx *tm.PersistenceContext) {
+						data := ctx.GetData()
 						var msg tgbotapi.MessageConfig
 						if u.Message.Text == "Yes" {
 							lastID++
@@ -96,22 +106,18 @@ func main() {
 						} else {
 							msg = tgbotapi.NewMessage(u.Message.Chat.ID, "Cancelled.")
 						}
-						for k := range data {
-							delete(data, k)
-						}
+						ctx.ClearData()
 						msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(false)
 						bot.Send(msg)
-						return ""
+						ctx.SetState("")
 					}),
 				},
 			},
 			[]*tm.TransitionHandler{
-				tm.NewTransitionHandler(tm.IsCommandMessage("cancel"), func(u *tm.Update, data tm.Data) string {
-					for k := range data {
-						delete(data, k)
-					}
+				tm.NewTransitionHandler(tm.IsCommandMessage("cancel"), func(u *tm.Update, ctx *tm.PersistenceContext) {
+					ctx.ClearData()
 					bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Cancelled."))
-					return ""
+					ctx.SetState("")
 				}),
 			},
 		)).

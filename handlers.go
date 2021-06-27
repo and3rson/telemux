@@ -10,7 +10,7 @@ type Handler struct {
 // This string is used to change conversation state in conversation handlers.
 type TransitionHandler struct {
 	Filter Filter
-	Handle func(u *Update, data Data) string
+	Handle func(u *Update, ctx *PersistenceContext)
 }
 
 // NewHandler creates a new handler.
@@ -21,8 +21,17 @@ func NewHandler(filter Filter, handle func(u *Update)) *Handler {
 	return &Handler{filter, handle}
 }
 
+// NewAsyncHandler creates a new handler which will be executed in a goroutine.
+func NewAsyncHandler(filter Filter, handle func(u *Update)) *Handler {
+	return NewHandler(filter, func(u *Update) {
+		go func(uu *Update) {
+			handle(uu)
+		}(u)
+	})
+}
+
 // NewTransitionHandler creates a new transition handler for a conversation handler.
-func NewTransitionHandler(filter Filter, handle func(u *Update, data Data) string) *TransitionHandler {
+func NewTransitionHandler(filter Filter, handle func(u *Update, ctx *PersistenceContext)) *TransitionHandler {
 	if filter == nil {
 		filter = Any()
 	}
@@ -36,7 +45,8 @@ func NewTransitionHandler(filter Filter, handle func(u *Update, data Data) strin
 // "persistence" defines where to store conversation state & intermediate inputs from the user. Without persistence, a conversation would not be able to "remember" what "step" the user is at.
 //
 // "states" define the TransitionHandlers to use in what state. States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at. It's recommended to have an empty string (`""`) as an initial state (i. e. if the conversation has not started yet or has already finished.) For each state you can provide a list of at least one TransitionHandler. If none of the handlers can handle the update, the default handlers are attempted (see below).
-// In order to switch to a different state your TransitionHandler must return a string that contains the name of the state you want to switch into.
+// In order to switch to a different state your TransitionHandler must call `ctx.SetState("STATE_NAME") ` replacing STATE_NAME with the name of the state you want to switch into.
+// Conversation data can be accessed with `ctx.GetData()` and updated with `ctx.SetData(newData)`.
 //
 // "defaults" are "appended" to every state. They are useful to handle commands such as "/cancel" or to display some default message.
 func NewConversationHandler(
@@ -69,9 +79,10 @@ func NewConversationHandler(
 			}
 			for _, handler := range candidates {
 				if handler.Filter(u) {
-					data := persistence.GetConversationData(pk)
-					persistence.SetState(pk, handler.Handle(u, data))
-					persistence.SetConversationData(pk, data)
+					handler.Handle(u, &PersistenceContext{
+						Persistence: persistence,
+						PK:          pk,
+					})
 					return
 				}
 			}

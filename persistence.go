@@ -20,8 +20,34 @@ type ConversationPersistence interface {
 	GetState(pk PersistenceKey) string
 	SetState(pk PersistenceKey, state string)
 	// GetConversationData & SetConversationData allow conversation transition handlers to store intermediate data.
-	GetConversationData(pk PersistenceKey) Data
-	SetConversationData(pk PersistenceKey, data Data)
+	GetData(pk PersistenceKey) Data
+	SetData(pk PersistenceKey, data Data)
+}
+
+// PersistenceContext allows handler to get/set conversation data & change conversation state.
+type PersistenceContext struct {
+	Persistence ConversationPersistence
+	PK          PersistenceKey
+}
+
+// GetData returns data of current conversation.
+func (c *PersistenceContext) GetData() Data {
+	return c.Persistence.GetData(c.PK)
+}
+
+// SetData updates data of current conversation.
+func (c *PersistenceContext) SetData(data Data) {
+	c.Persistence.SetData(c.PK, data)
+}
+
+// ClearData clears data of current conversation.
+func (c *PersistenceContext) ClearData() {
+	c.Persistence.SetData(c.PK, make(map[string]interface{}))
+}
+
+// SetState changes state of current conversation.
+func (c *PersistenceContext) SetState(state string) {
+	c.Persistence.SetState(c.PK, state)
 }
 
 // PersistenceKey contains user & chat IDs. It is used to identify conversations with different users in different chats.
@@ -94,8 +120,8 @@ func (p *LocalPersistence) SetState(pk PersistenceKey, state string) {
 	p.States[pk] = state
 }
 
-// GetConversationData returns conversation data from memory
-func (p *LocalPersistence) GetConversationData(pk PersistenceKey) Data {
+// GetData returns conversation data from memory
+func (p *LocalPersistence) GetData(pk PersistenceKey) Data {
 	data, ok := p.Data[pk]
 	if !ok {
 		p.Data[pk] = make(Data)
@@ -104,8 +130,8 @@ func (p *LocalPersistence) GetConversationData(pk PersistenceKey) Data {
 	return data
 }
 
-// SetConversationData stores conversation data in memory
-func (p *LocalPersistence) SetConversationData(pk PersistenceKey, data Data) {
+// SetData stores conversation data in memory
+func (p *LocalPersistence) SetData(pk PersistenceKey, data Data) {
 	p.Data[pk] = data
 }
 
@@ -184,8 +210,8 @@ func (p *FilePersistence) SetState(pk PersistenceKey, state string) {
 	p.writeContent(content)
 }
 
-// GetConversationData reads conversation data from file
-func (p *FilePersistence) GetConversationData(pk PersistenceKey) Data {
+// GetData reads conversation data from file
+func (p *FilePersistence) GetData(pk PersistenceKey) Data {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	content := p.readContent()
@@ -196,8 +222,8 @@ func (p *FilePersistence) GetConversationData(pk PersistenceKey) Data {
 	return data
 }
 
-// SetConversationData writes conversation data to file
-func (p *FilePersistence) SetConversationData(pk PersistenceKey, data Data) {
+// SetData writes conversation data to file
+func (p *FilePersistence) SetData(pk PersistenceKey, data Data) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	content := p.readContent()

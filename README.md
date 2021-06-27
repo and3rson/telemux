@@ -125,6 +125,28 @@ mux.AddHandler(tm.NewHandler(
 ))
 ```
 
+If you want your handler to be executed in a goroutine, use `tm.NewAsyncHandler`. It's similar to wrapping a handler function in an anonymous goroutine invocation:
+
+```go
+mux := tm.NewMux()
+// Option 1: using NewAsyncHandler
+mux.AddHandler(tm.NewAsyncHandler(
+    tm.IsCommandMessage("do_work"),
+    func(u *tm.Update) {
+        // Slow operation
+    },
+))
+// Option 2: wrapping manually
+mus.AddHandler(tm.NewHandler(
+    tm.IsCommandMessage("do_work"),
+    func(u *tm.Update) {
+        go func() {
+            // Slow operation
+        }
+    },
+))
+```
+
 ## Conversations & persistence
 
 Conversations are handlers on steroids based on the finite-state machine pattern.
@@ -152,13 +174,30 @@ To create a ConversationHandler you need to provide the following:
 
     For each state you can provide a list of at least one TransitionHandler. If none of the handlers can handle the update, the default handlers are attempted (see below).
 
-    In order to switch to a different state your TransitionHandler must return a string that contains the name of the state you want to switch into.
+    In order to switch to a different state your TransitionHandler must call `ctx.SetState("STATE_NAME") ` replacing STATE_NAME with the name of the state you want to switch into.
+
+    Conversation data can be accessed with `ctx.GetData()` and updated with `ctx.SetData(newData)`.
+
 
 - `defaults []*TransitionHandler` - these handlers are "appended" to every state.
 
     Useful to handle commands such as "/cancel" or to display some default message.
 
 See [./examples/album_conversation/main.go](./examples/album_conversation/main.go) for a conversation example.
+
+## Error handling
+
+By default, panics in handlers are propagated all the way to the top (`Dispatch` method).
+
+In order to intercept all panics in your handlers globally and handle them gracefully, register your function using `SetRecoverer`:
+
+```go
+mux := tm.NewMux()
+# ...
+mux.SetRecoverer(func(u *tm.Update, err error) {
+    fmt.Printf("An error occured: %s", err)
+})
+```
 
 # Tips & common pitfalls
 
