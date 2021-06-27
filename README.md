@@ -100,7 +100,7 @@ Handler's filter decides whether this handler can handle the incoming update.
 If so, handle-function is called. Otherwise multiplexer will proceed to the next handler.
 
 Filters are divided in two groups: content filters (starting with "Has", such as `HasPhoto()`, `HasAudio()`, `HasSticker()` etc)
-and update type filters (starting with "Os", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
+and update type filters (starting with "Is", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
 
 There is also a special filter `Any()` which makes handler accept all updates.
 
@@ -166,6 +166,8 @@ To create a ConversationHandler you need to provide the following:
     Without persistence, a conversation would not be able to "remember" what "step" the user is at.
 
     Persistence is also useful when you want to collect some data from the user step-by-step).
+
+    Two convenient implementations of `Persistence` are available out of the box: `LocalPersistence` & `FilePersistence`.
 
 - `states map[string][]*TransitionHandler` - defines which TransitionHandlers to use in what state.
 
