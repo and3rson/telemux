@@ -145,6 +145,8 @@ To create a ConversationHandler you need to provide the following:
 
     Persistence is also useful when you want to collect some data from the user step-by-step).
 
+    Two convenient implementations of `Persistence` are available out of the box: `LocalPersistence` & `FilePersistence`.
+
 - `states map[string][]*TransitionHandler` - defines which TransitionHandlers to use in what state.
 
     States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at.
