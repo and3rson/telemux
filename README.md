@@ -100,7 +100,7 @@ Handler's filter decides whether this handler can handle the incoming update.
 If so, handle-function is called. Otherwise multiplexer will proceed to the next handler.
 
 Filters are divided in two groups: content filters (starting with "Has", such as `HasPhoto()`, `HasAudio()`, `HasSticker()` etc)
-and update type filters (starting with "Os", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
+and update type filters (starting with "Is", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
 
 There is also a special filter `Any()` which makes handler accept all updates.
 
