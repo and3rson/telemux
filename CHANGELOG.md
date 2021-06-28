@@ -1,3 +1,5 @@
+# Changelog
+
 ## v1.3.0
 
 - readme: update docs on persistence & recoverer

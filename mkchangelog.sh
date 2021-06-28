@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "# Changelog"
+echo
+
 tags=`git tag | sort -Vr`
 tag=
 for prev in $tags

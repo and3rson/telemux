@@ -8,7 +8,6 @@ Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-t
 <!-- TOC generated with https://luciopaiva.com/markdown-toc/ -->
 # Table of contents
 
-- [telemux](#telemux)
 - [Motivation](#motivation)
 - [Features](#features)
 - [Minimal example](#minimal-example)
