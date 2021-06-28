@@ -5,6 +5,25 @@ Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-t
 
 ![Screenshot](./sample_screenshot.png)
 
+<!-- TOC generated with https://luciopaiva.com/markdown-toc/ -->
+# Table of contents
+
+- [telemux](#telemux)
+- [Motivation](#motivation)
+- [Features](#features)
+- [Minimal example](#minimal-example)
+- [Documentation](#documentation)
+- [Changelog](#changelog)
+- [Terminology](#terminology)
+  - [Mux](#mux)
+  - [Handlers & filters](#handlers--filters)
+  - [Conversations & persistence](#conversations--persistence)
+  - [Error handling](#error-handling)
+- [Tips & common pitfalls](#tips--common-pitfalls)
+  - [tgbotapi.Update vs tm.Update confusion](#tgbotapiupdate-vs-tmupdate-confusion)
+  - [Getting user/chat/message object from update](#getting-userchatmessage-object-from-update)
+  - [Properly filtering updates](#properly-filtering-updates)
+
 # Motivation
 
 This library serves as an addition to the [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library.
