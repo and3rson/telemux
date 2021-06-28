@@ -72,6 +72,10 @@ The documentation is available [here](https://pkg.go.dev/github.com/and3rson/tel
 
 Examples are available [here](./examples/).
 
+# Changelog
+
+Changelog is available [here](./CHANGELOG.md).
+
 # Terminology
 
 ## Mux
