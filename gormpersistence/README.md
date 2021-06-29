@@ -1,6 +1,12 @@
 # gormpersistence
 
-Support for GORM as persistence backendd.
+Support for GORM as persistence backend.
+
+## Installation
+
+```sh
+go get github.com/and3rson/telemux/gormpersistence
+```
 
 ## Example usage
 
