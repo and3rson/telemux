@@ -52,9 +52,9 @@ func (c *PersistenceContext) SetState(state string) {
 
 // PersistenceKey contains user & chat IDs. It is used to identify conversations with different users in different chats.
 type PersistenceKey struct {
-	ConversationID string
-	UserID         int
-	ChatID         int64
+	ConversationID string `gorm:"primaryKey;autoIncrement:false"`
+	UserID         int    `gorm:"primaryKey;autoIncrement:false"`
+	ChatID         int64  `gorm:"primaryKey;autoIncrement:false"`
 }
 
 // String returns a string in form "USER_ID:CHAT_ID".
