@@ -26,7 +26,7 @@ import (
 func main() {
     db, _ := gorm.Open(postgres.Open(os.Getenv("DB_DSN")), &gorm.Config{})
     // Create GORMPersistence
-    p = gormpersistence.GORMPersistence{db}
+    p := gormpersistence.GORMPersistence{db}
 
     // Create required tables
     p.AutoMigrate()
