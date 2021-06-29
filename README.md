@@ -39,6 +39,7 @@ This project is in early beta stage. Contributions are welcome! Feel free to sub
 - Extensible handler configuration inspired by [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) library
 - Conversations (aka Dialogs) based on finite-state machines (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go))
 - Pluggable persistence for conversations. E. g. you can use database to store the states & intermediate values of conversations (see [./examples/album_conversation/main.go](./examples/album_conversation/main.go) and [./persistence.go](./persistence.go))
+- Support for GORM as a persistence backend via ![gormpersistence](./gormpersistence) module
 - Flexible handler filtering. E. g. `And(Or(HasText(), HasPhoto()), IsPrivate())` will only accept direct messages containing photo or text (see [./filters.go](./filters.go))
 
 # Minimal example
@@ -191,10 +192,12 @@ To create a ConversationHandler you need to provide the following:
 
     Two convenient implementations of `Persistence` are available out of the box: `LocalPersistence` & `FilePersistence`.
 
+    Telemux also supports GORM persistence. If you use GORM, you can store conversation states & data in your database by using `GORMPersistence` from a ![gormpersistence](./gormpersistence) module.
+
 - `states map[string][]*TransitionHandler` - defines which TransitionHandlers to use in what state.
 
     States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at.
-    It's recommended to have an empty string (`""`) as an initial state (i. e. if the conversation has not started yet or has already finished.)
+    Empty string (`""`) shoulb be used as an initial/final state (i. e. if the conversation has not started yet or has already finished.)
 
     For each state you can provide a list of at least one TransitionHandler. If none of the handlers can handle the update, the default handlers are attempted (see below).
 

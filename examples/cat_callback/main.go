@@ -43,7 +43,6 @@ func main() {
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("TG_TOKEN"))
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
@@ -52,7 +51,6 @@ func main() {
 	updates, err := bot.GetUpdatesChan(u)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	loadingMarkup := tgbotapi.NewInlineKeyboardMarkup(
