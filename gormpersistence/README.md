@@ -14,17 +14,17 @@ go get github.com/and3rson/telemux/gormpersistence
 package main
 
 import (
-	"fmt"
-	"log"
+    "fmt"
+    "log"
     "os"
 
-	tm "github.com/and3rson/telemux"
-	"github.com/and3rson/telemux/gormpersistence"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+    tm "github.com/and3rson/telemux"
+    "github.com/and3rson/telemux/gormpersistence"
+    tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 func main() {
-	db, _ := gorm.Open(postgres.Open(os.Getenv("DB_DSN")), &gorm.Config{})
+    db, _ := gorm.Open(postgres.Open(os.Getenv("DB_DSN")), &gorm.Config{})
     // Create GORMPersistence
     p = gormpersistence.GORMPersistence{db}
 
@@ -33,19 +33,19 @@ func main() {
     // ...alias for:
     // db.AutoMigrate(&gormpersistence.ConversationState{}, &gormpersistence.ConversationData{})
 
-	bot, _ := tgbotapi.NewBotAPI(os.Getenv("TG_TOKEN"))
-	bot.Debug = true
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+    bot, _ := tgbotapi.NewBotAPI(os.Getenv("TG_TOKEN"))
+    bot.Debug = true
+    u := tgbotapi.NewUpdate(0)
+    u.Timeout = 60
 
-	updates, _ := bot.GetUpdatesChan(u)
+    updates, _ := bot.GetUpdatesChan(u)
 
-	mux := tm.NewMux().
-		AddHandler(tm.NewConversationHandler(
-			"upload_photo_dialog",
-			p, // We provide GORMPersistence as persistence backend for our conversation handler
-			map[string][]*tm.TransitionHandler{
-				"": {
+    mux := tm.NewMux().
+        AddHandler(tm.NewConversationHandler(
+            "upload_photo_dialog",
+            p, // We provide GORMPersistence as persistence backend for our conversation handler
+            map[string][]*tm.TransitionHandler{
+                "": {
                     // Handlers for initial state, i. e. for conversation activation
                     // ...
                 },
@@ -58,7 +58,7 @@ func main() {
                     // ...
                 }
             },
-			[]*tm.TransitionHandler{
+            []*tm.TransitionHandler{
                 // Default handlers
             },
         ))
