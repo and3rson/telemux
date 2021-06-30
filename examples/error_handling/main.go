@@ -56,7 +56,7 @@ func main() {
 					chat.ID,
 					fmt.Sprintf("Oops, an error occurred: %s", err),
 				))
-				log.Printf("Warning! An error occured: %s", err)
+				log.Printf("Warning! An error occurred: %s", err)
 			}
 		})
 	for update := range updates {
