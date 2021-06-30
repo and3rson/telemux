@@ -10,6 +10,13 @@ import (
 // It provides some convenient functions such as GetEffectiveUser.
 type Update struct {
 	tgbotapi.Update
+	Bot      *tgbotapi.BotAPI
+	Consumed bool
+}
+
+// Consume marks update as processed. Used by filters to interrupt further processing of the update.
+func (u *Update) Consume() {
+	u.Consumed = true
 }
 
 // EffectiveUser retrieves user object from update.

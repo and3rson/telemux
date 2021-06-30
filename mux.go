@@ -35,8 +35,8 @@ func (m *Mux) SetRecoverer(recoverer Recoverer) *Mux {
 }
 
 // Dispatch tells Mux to process the update.
-func (m *Mux) Dispatch(u tgbotapi.Update) bool {
-	uu := Update{u}
+func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
+	uu := Update{u, bot, false}
 
 	defer func() {
 		if err, ok := recover().(error); ok {
@@ -50,8 +50,11 @@ func (m *Mux) Dispatch(u tgbotapi.Update) bool {
 	}()
 
 	for _, handler := range m.Handlers {
-		if handler.Filter(&uu) {
+		accepted := handler.Filter(&uu)
+		if accepted {
 			handler.Handle(&uu)
+			return true
+		} else if uu.Consumed {
 			return true
 		}
 	}

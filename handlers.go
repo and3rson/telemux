@@ -64,7 +64,10 @@ func NewConversationHandler(
 				candidates = append(candidates, defaults...)
 			}
 			for _, handler := range candidates {
-				if handler.Filter(u) {
+				accepted := handler.Filter(u)
+				if accepted {
+					return true
+				} else if u.Consumed {
 					return true
 				}
 			}

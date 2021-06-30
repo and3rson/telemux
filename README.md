@@ -16,6 +16,9 @@ Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-t
 - [Terminology](#terminology)
   - [Mux](#mux)
   - [Handlers & filters](#handlers--filters)
+    - [Combining filters](#combining-filters)
+    - [Asynchronous handlers](#asynchronous-handlers)
+    - [Consuming update from filters](#consuming-update-from-filters)
   - [Conversations & persistence](#conversations--persistence)
   - [Error handling](#error-handling)
 - [Tips & common pitfalls](#tips--common-pitfalls)
@@ -80,7 +83,7 @@ func main() {
         ))
     // Dispatch all telegram updates to multiplexer
     for update := range updates {
-        mux.Dispatch(update)
+        mux.Dispatch(bot, update)
     }
 }
 ```
@@ -111,7 +114,7 @@ mux := tm.NewMux()
 // ...
 updates, _ := bot.GetUpdatesChan(u)
 for update := range updates {
-    mux.Dispatch(update)
+    mux.Dispatch(bot, update)
 }
 ```
 
@@ -126,6 +129,8 @@ Filters are divided in two groups: content filters (starting with "Has", such as
 and update type filters (starting with "Is", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
 
 There is also a special filter `Any()` which makes handler accept all updates.
+
+### Combining filters
 
 Filters can be chained using `And`, `Or`, and `Not` meta-filters. For example:
 
@@ -148,6 +153,8 @@ mux.AddHandler(tm.NewHandler(
 ))
 ```
 
+### Asynchronous handlers
+
 If you want your handler to be executed in a goroutine, use `tm.NewAsyncHandler`. It's similar to wrapping a handler function in an anonymous goroutine invocation:
 
 ```go
@@ -169,6 +176,63 @@ mus.AddHandler(tm.NewHandler(
     },
 ))
 ```
+
+### Consuming update from filters
+
+Although main purpose of filters is to decide whether a handler can process an update, there are often situations
+when a filter needs to mark update as "consumed" (i. e. "processed") and prevent its further processing *without actually invoking the handler*.
+In this case filters can call `u.Consume()` on Update and return `false`. This will prevent handler from executing and also
+prevent `Mux` from going further down the handler chain. Here's an example:
+
+```go
+mux.AddHandler(tm.NewHandler(
+    tm.IsCommandMessage("do_work"),
+    func(u *tm.Update) {
+        if u.EffectiveUser().ID != 3442691337 { // Boilerplate code that will be copy-pasted way too much
+            u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "You are not allowed to ask me to work!"))
+            return
+        }
+        if !u.EffectiveChat().IsPrivate() { // Another boilerplate code
+            u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
+            return
+        }
+        // Do actual work
+    },
+))
+```
+
+To avoid repeating boilerplate checks like `if user is not "3442691337" then send error and stop", you can "consume" the update from within a filter.
+The above code can be rewritten as follows:
+
+```go
+// CheckAdmin is a reusable filter that not only checks for user's ID but marks update as processed as well
+func CheckAdmin(u *tm.Update) {
+    if u.EffectiveUser().ID != 3442691337 { // Boilerplate code that will be copy-pasted way too much
+        u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "You are not allowed to ask me to work!"))
+        return false
+    }
+    return true
+}
+
+// CheckPrivate is a reusable filter that not only checks for private chat but marks update as processed as well
+func CheckPrivate(u *tm.Update) {
+    if !u.EffectiveChat().IsPrivate() { // Boilerplate code that will be copy-pasted way too much
+        u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
+        return false
+    }
+    return true
+}
+
+// ...
+
+mux.AddHandler(tm.NewHandler(
+    And(tm.IsCommandMessage("do_work"), CheckAdmin, CheckPrivate),
+    func(u *tm.Update) {
+        // Do actual work
+    },
+))
+```
+
 
 ## Conversations & persistence
 
@@ -231,7 +295,8 @@ mux.SetRecoverer(func(u *tm.Update, err error) {
 ## tgbotapi.Update vs tm.Update confusion
 
 Since `Update` struct from go-telegram-bot-api already provides most of the functionality, telemux implements its own `Update` struct
-which embeds the `Update` from go-telegram-bot-api. Main reason for this is to add some extra convenient methods.
+which embeds the `Update` from go-telegram-bot-api. Main reason for this is to add some extra convenient methods and include Bot instance
+with every update.
 
 ## Getting user/chat/message object from update
 

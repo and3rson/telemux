@@ -71,6 +71,6 @@ func main() {
 			},
 		))
 	for update := range updates {
-		mux.Dispatch(update)
+		mux.Dispatch(bot, update)
 	}
 }
