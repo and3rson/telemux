@@ -46,6 +46,7 @@ func (m *Mux) Dispatch(u tgbotapi.Update) bool {
 				panic(err)
 			}
 		}
+		// TODO: what if err is string?
 	}()
 
 	for _, handler := range m.Handlers {

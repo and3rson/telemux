@@ -78,10 +78,11 @@ func IsAnyCommandMessage() Filter {
 // IsCommandMessage filters updates that contain a specific command.
 // For example, IsCommandMessage("start") will handle a "/start" command.
 // This will also allow the user to pass arguments, e. g. "/start foo bar".
+// Commands in format "/start@bot_name" are also supported.
 // It also filters only new messages (edited messages, channel posts, callback queries etc are all excluded.)
 func IsCommandMessage(cmd string) Filter {
 	return func(u *Update) bool {
-		return u.Message != nil && (u.Message.Text == "/"+cmd || strings.HasPrefix(u.Message.Text, "/"+cmd+" "))
+		return u.Message != nil && (u.Message.Text == "/"+cmd || strings.HasPrefix(u.Message.Text, "/"+cmd+" ") || strings.HasPrefix(u.Message.Text, "/"+cmd+"@"))
 	}
 }
 

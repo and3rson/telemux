@@ -1,6 +1,8 @@
 package telemux
 
 import (
+	"log"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -16,6 +18,10 @@ func (u *Update) EffectiveUser() *tgbotapi.User {
 		return u.Message.From
 	} else if u.EditedMessage != nil {
 		return u.EditedMessage.From
+	} else if u.ChannelPost != nil {
+		return u.ChannelPost.From
+	} else if u.EditedChannelPost != nil {
+		return u.EditedChannelPost.From
 	} else if u.InlineQuery != nil {
 		return u.InlineQuery.From
 	} else if u.ChosenInlineResult != nil {
@@ -27,6 +33,7 @@ func (u *Update) EffectiveUser() *tgbotapi.User {
 	} else if u.PreCheckoutQuery != nil {
 		return u.PreCheckoutQuery.From
 	} // TODO: Polls not yet supported by go-telegram-bot-api?
+	log.Println("Sender not found in update object! This is possibly a bug.")
 	return nil
 }
 
