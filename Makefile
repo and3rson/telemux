@@ -4,6 +4,7 @@ all: | test vet lint
 
 test:
 	go test ./...
+	make -C gormpersistence test
 
 vet:
 	go vet ./...
