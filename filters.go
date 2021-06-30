@@ -81,7 +81,7 @@ func IsAnyCommandMessage() Filter {
 // It also filters only new messages (edited messages, channel posts, callback queries etc are all excluded.)
 func IsCommandMessage(cmd string) Filter {
 	return func(u *Update) bool {
-		return u.Message != nil && (u.Message.Text == "/"+cmd || strings.HasPrefix(u.Message.Text, "/"+cmd))
+		return u.Message != nil && (u.Message.Text == "/"+cmd || strings.HasPrefix(u.Message.Text, "/"+cmd+" "))
 	}
 }
 
