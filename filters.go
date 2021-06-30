@@ -71,6 +71,7 @@ func HasText() Filter {
 // It also filters new message and excludes edited messages, channel posts, callback queries etc.
 func IsAnyCommandMessage() Filter {
 	return func(u *Update) bool {
+		// TODO: handle stuff like /unknown_command@bot_name
 		return u.Message != nil && u.Message.Text != "" && u.Message.Text[0] == '/'
 	}
 }

@@ -207,8 +207,9 @@ The above code can be rewritten as follows:
 ```go
 // CheckAdmin is a reusable filter that not only checks for user's ID but marks update as processed as well
 func CheckAdmin(u *tm.Update) {
-    if u.EffectiveUser().ID != 3442691337 { // Boilerplate code that will be copy-pasted way too much
+    if u.EffectiveUser().ID != 3442691337 {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "You are not allowed to ask me to work!"))
+        u.Consume() // Mark update as consumed
         return false
     }
     return true
@@ -216,8 +217,9 @@ func CheckAdmin(u *tm.Update) {
 
 // CheckPrivate is a reusable filter that not only checks for private chat but marks update as processed as well
 func CheckPrivate(u *tm.Update) {
-    if !u.EffectiveChat().IsPrivate() { // Boilerplate code that will be copy-pasted way too much
+    if !u.EffectiveChat().IsPrivate() {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
+        u.Consume() // Mark update as consumed
         return false
     }
     return true
@@ -227,6 +229,31 @@ func CheckPrivate(u *tm.Update) {
 
 mux.AddHandler(tm.NewHandler(
     And(tm.IsCommandMessage("do_work"), CheckAdmin, CheckPrivate),
+    func(u *tm.Update) {
+        // Do actual work
+    },
+))
+```
+
+You can implement some more complex filters, for example, a parametrized one:
+
+```go
+// CheckUserID checks for specific user ID and marks update processed if check fails
+func CheckUserID(userID int) tm.Filter {
+    return func(u *tm.Update) {
+        if u.EffectuveUser().ID != userID {
+            u.Bot.Send(tgbotapi.NewMessage(u.EffectiveChat().ID, "Sorry, I don't know you!"))
+            u.Consume()
+            return false
+        }
+        return true
+    }
+}
+
+// ...
+
+mux.AddHandler(tm.NewHandler(
+    And(tm.IsCommandMessage("do_work"), CheckUserID(3442691337)),
     func(u *tm.Update) {
         // Do actual work
     },
