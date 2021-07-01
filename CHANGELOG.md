@@ -1,5 +1,55 @@
 # Changelog
 
+## v1.4.5
+
+- mux: pass stack trace to recoverer
+- readme: update docs
+- examples: update recoverer implementation
+
+## v1.4.4
+
+- readme: fix errors
+- filters: add todo
+
+## v1.4.3
+
+- readme: add section on update consumption
+- readme: update TOC
+- mux: add bot arg to Dispatch
+- mux: check if message is consumed
+- filters: update IsCommandMessage filter to check against bot username
+- examples: update Dispatch invocation
+- gormpersistence: update readme
+- update: add Bot & Consumed to Update struct
+- handlers: check if message is consumed
+
+## v1.4.2
+
+- filters: add /foo@bar format support for IsCommandMessage
+- mux: add todo
+- update: add handlig of missing cases for Update.EffectiveUser
+
+## v1.4.1
+
+- filters: fix IsAnyCommand improperly matching command prefixes
+- examples: fix spelling
+- gormpersistence: add unit tests
+- gormpersistence: change tabs to spaces in readme
+- global: update makefiles
+- gormpersistence: update readme
+
+## v1.4.0
+
+- examples: remove redundant os.Exit(1) calls
+- readme: add info about GORMPersistence & update info on default state
+- gormpersistence: add docstrings
+- gormpersistence: add readme
+- persistence: add GORM tags to PersistenceKey
+- gormpersistence: models: add ConversationState & ConversationData models
+- gormpersistence: persistence: add GORMPersistence implementation
+- readme: add TOC
+- global: add mkchangelog.sh & CHANGELOG.md
+
 ## v1.3.0
 
 - readme: update docs on persistence & recoverer
@@ -73,4 +123,13 @@
 
 ## v1.0.0
 
+
+## v0.0.0
+
+
+## gormpersistence/v1.0.1
+
+- gormpersistence: change tabs to spaces in readme
+- global: update makefiles
+- gormpersistence: update readme
 
