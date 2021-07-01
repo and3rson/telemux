@@ -1,5 +1,35 @@
 # Changelog
 
+## v1.6.0
+
+- readme: drop async handlers section
+- readme: drop section about update consumption from filters
+- readme: add section about update consumption from handle functions
+- readme: replace "list" with "slice"
+- readme: update examples
+- handlers: drop NewAsyncHandler
+- handlers: add HandleFunc
+- handlers: do not check if u.Consumed by filters in TransitionHandler
+- filters: rename Filter to FilterFunc
+- examples: drop async handler usage from cat_callback
+- mux: do not check if u.Consumed by filters in Mux
+
+## v1.5.3
+
+- mux: fix varargs for AddHandler & AddMux
+
+## v1.5.2
+
+- mux: allow varargs for AddHandler & AddMux
+
+## v1.5.1
+
+- mux: add nested mux support via AddMux
+- mux: add global filters via SetGlobalFilter
+- mux: prioritize update consumption over filter return result
+- handlers: prioritize update consumption over filter return result
+- examples: add nested_mux example
+
 ## v1.5.0
 
 - readme: update docs on conversations
