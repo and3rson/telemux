@@ -201,7 +201,7 @@ mux.AddHandler(tm.NewHandler(
 ))
 ```
 
-To avoid repeating boilerplate checks like `if user is not "3442691337" then send error and stop", you can "consume" the update from within a filter.
+To avoid repeating boilerplate checks like `if user is not "3442691337" then send error and stop`, you can "consume" the update from within a filter.
 The above code can be rewritten as follows:
 
 ```go
@@ -231,6 +231,12 @@ mux.AddHandler(tm.NewHandler(
     And(tm.IsCommandMessage("do_work"), CheckAdmin, CheckPrivate),
     func(u *tm.Update) {
         // Do actual work
+    },
+))
+mux.AddHandler(tm.NewHandler(
+    tm.IsCommandMessage("other_command")),
+    func(u *tm.Update) {
+        // This handler will not fire if one of previous filters (CheckAdmin or CheckPrivate) consumed the update.
     },
 ))
 ```
@@ -312,8 +318,8 @@ In order to intercept all panics in your handlers globally and handle them grace
 ```go
 mux := tm.NewMux()
 # ...
-mux.SetRecoverer(func(u *tm.Update, err error) {
-    fmt.Printf("An error occured: %s", err)
+mux.SetRecoverer(func(u *tm.Update, err error, stackTrace string) {
+    fmt.Printf("An error occured: %s\n\nStack trace:\n%s", err, stackTrace)
 })
 ```
 

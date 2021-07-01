@@ -5,11 +5,13 @@
 package telemux
 
 import (
+	"runtime/debug"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 // Recoverer is a function that handles panics.
-type Recoverer = func(*Update, error)
+type Recoverer = func(*Update, error, string)
 
 // Mux is a container for handlers.
 type Mux struct {
@@ -41,7 +43,7 @@ func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
 	defer func() {
 		if err, ok := recover().(error); ok {
 			if m.Recoverer != nil {
-				m.Recoverer(&uu, error(err))
+				m.Recoverer(&uu, error(err), string(debug.Stack()))
 			} else {
 				panic(err)
 			}
