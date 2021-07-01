@@ -6,8 +6,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-// Update wraps tgbotapi.Update.
-// It provides some convenient functions such as GetEffectiveUser.
+// Update wraps tgbotapi.Update and stores some additional data.
 type Update struct {
 	tgbotapi.Update
 	Bot                *tgbotapi.BotAPI

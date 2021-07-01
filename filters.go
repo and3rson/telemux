@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// FilterFunc checks Update and returns true if the update satisfies this filter.
+// FilterFunc is used to check if this update should be processed by handler.
 type FilterFunc func(u *Update) bool
 
 // Any tells handler to process all updates.

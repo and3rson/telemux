@@ -9,6 +9,16 @@ type Handler struct {
 	Handles []HandleFunc
 }
 
+func (h *Handler) process(u *Update) bool {
+	if h.Filter(u) {
+		for i := 0; i < len(h.Handles) && !u.Consumed; i++ {
+			h.Handles[i](u)
+		}
+		return true
+	}
+	return false
+}
+
 // NewHandler creates a new handler.
 func NewHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
 	if filter == nil {
