@@ -320,7 +320,7 @@ In order to intercept all panics in your handlers globally and handle them grace
 mux := tm.NewMux()
 # ...
 mux.SetRecoverer(func(u *tm.Update, err error, stackTrace string) {
-    fmt.Printf("An error occured: %s\n\nStack trace:\n%s", err, stackTrace)
+    fmt.Printf("An error occurred: %s\n\nStack trace:\n%s", err, stackTrace)
 })
 ```
 
