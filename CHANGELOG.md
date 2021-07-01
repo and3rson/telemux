@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.5.0
+
+- readme: update docs on conversations
+- examples: update conversation example
+- gormpersistence: update readme
+- handlers: set PersistenceContext during conversation filters/handlers
+- mux: set PersistenceContext to nil by default
+- update: add PersistenceContext to Update
+- persistence: update wording
+- changelog: update mkchangelog.sh and CHANGELOG.md
+- makefile: update TAG variable
+
 ## v1.4.5
 
 - mux: pass stack trace to recoverer
