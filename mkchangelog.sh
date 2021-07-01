@@ -18,7 +18,7 @@ do
     IFS=$'\n'
     for line in $lines
     do
-        line=$(echo "$line" | sed -re "s/^([a-z_]+): ([a-z-]+)\b/\`\1\`: *\2*/g")
+        line=$(echo "$line" | sed -re "s/^([a-z_]+): ([a-z-]+)\b/\`\1\`: _\2_/g")
         echo "- $line"
     done
     echo
