@@ -3,7 +3,7 @@
 echo "# Changelog"
 echo
 
-tags=`git tag | sort -Vr`
+tags=`git tag | grep -v gormpersistence | sort -Vr`
 tag=
 for prev in $tags
 do

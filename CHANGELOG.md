@@ -124,12 +124,3 @@
 ## v1.0.0
 
 
-## v0.0.0
-
-
-## gormpersistence/v1.0.1
-
-- gormpersistence: change tabs to spaces in readme
-- global: update makefiles
-- gormpersistence: update readme
-

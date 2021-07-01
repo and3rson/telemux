@@ -1,4 +1,4 @@
-TAG=$(shell git tag --points-at HEAD | grep gormpersistence | sed 's/gormpersistence\///g')
+TAG ?= $(shell git tag --points-at HEAD | grep gormpersistence | sed 's/gormpersistence\///g')
 
 test:
 	go test ./...

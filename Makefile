@@ -1,4 +1,4 @@
-TAG=$(shell git tag --points-at HEAD | grep -v gormpersistence)
+TAG ?= $(shell git tag --points-at HEAD | grep -v gormpersistence)
 
 all: | test vet lint
 
