@@ -10,8 +10,9 @@ import (
 // It provides some convenient functions such as GetEffectiveUser.
 type Update struct {
 	tgbotapi.Update
-	Bot      *tgbotapi.BotAPI
-	Consumed bool
+	Bot                *tgbotapi.BotAPI
+	Consumed           bool
+	PersistenceContext *PersistenceContext
 }
 
 // Consume marks update as processed. Used by filters to interrupt further processing of the update.

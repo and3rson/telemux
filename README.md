@@ -291,19 +291,19 @@ To create a ConversationHandler you need to provide the following:
 
     Telemux also supports GORM persistence. If you use GORM, you can store conversation states & data in your database by using `GORMPersistence` from a ![gormpersistence](./gormpersistence) module.
 
-- `states map[string][]*TransitionHandler` - defines which TransitionHandlers to use in what state.
+- `states map[string][]*Handler` - defines what handlers to use in which state.
 
     States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at.
     Empty string (`""`) shoulb be used as an initial/final state (i. e. if the conversation has not started yet or has already finished.)
 
-    For each state you can provide a list of at least one TransitionHandler. If none of the handlers can handle the update, the default handlers are attempted (see below).
+    For each state you can provide a list of at least one Handler. If none of the handlers can handle the update, the default handlers are attempted (see below).
 
-    In order to switch to a different state your TransitionHandler must call `ctx.SetState("STATE_NAME") ` replacing STATE_NAME with the name of the state you want to switch into.
+    In order to switch to a different state your Handler must call `u.PersistenceContext.SetState("STATE_NAME") ` replacing STATE_NAME with the name of the state you want to switch into.
 
-    Conversation data can be accessed with `ctx.GetData()` and updated with `ctx.SetData(newData)`.
+    Conversation data can be accessed with `u.PersistenceContext.GetData()` and updated with `u.PersistenceContext.SetData(newData)`.
 
 
-- `defaults []*TransitionHandler` - these handlers are "appended" to every state.
+- `defaults []*Handler` - these handlers are "appended" to every state.
 
     Useful to handle commands such as "/cancel" or to display some default message.
 

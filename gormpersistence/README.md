@@ -44,7 +44,7 @@ func main() {
         AddHandler(tm.NewConversationHandler(
             "upload_photo_dialog",
             p, // We provide GORMPersistence as persistence backend for our conversation handler
-            map[string][]*tm.TransitionHandler{
+            map[string][]*tm.Handler{
                 "": {
                     // Handlers for initial state, i. e. for conversation activation
                     // ...
@@ -58,7 +58,7 @@ func main() {
                     // ...
                 }
             },
-            []*tm.TransitionHandler{
+            []*tm.Handler{
                 // Default handlers
             },
         ))

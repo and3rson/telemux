@@ -38,7 +38,7 @@ func (m *Mux) SetRecoverer(recoverer Recoverer) *Mux {
 
 // Dispatch tells Mux to process the update.
 func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
-	uu := Update{u, bot, false}
+	uu := Update{u, bot, false, nil}
 
 	defer func() {
 		if err, ok := recover().(error); ok {

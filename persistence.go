@@ -19,7 +19,7 @@ type ConversationPersistence interface {
 	// GetState & SetState tell conversation handlers how to retrieve & set conversation state.
 	GetState(pk PersistenceKey) string
 	SetState(pk PersistenceKey, state string)
-	// GetConversationData & SetConversationData allow conversation transition handlers to store intermediate data.
+	// GetConversationData & SetConversationData allow conversation handlers to store intermediate data.
 	GetData(pk PersistenceKey) Data
 	SetData(pk PersistenceKey, data Data)
 }
