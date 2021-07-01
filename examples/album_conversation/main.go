@@ -38,7 +38,7 @@ func main() {
 	mux := tm.NewMux().
 		AddHandler(tm.NewConversationHandler(
 			"upload_photo_dialog",
-			tm.NewLocalPersistence(), // we could also use `tm.NewFilePersistence("db.json"),` to keep data across bot restarts
+			tm.NewLocalPersistence(), // we could also use `tm.NewFilePersistence("db.json")` or `gormpersistence.GORMPersistence(db)` to keep data across bot restarts
 			map[string][]*tm.Handler{
 				"": {
 					tm.NewHandler(tm.IsCommandMessage("add"), func(u *tm.Update) {

@@ -5,6 +5,7 @@
 package telemux
 
 import (
+	"fmt"
 	"runtime/debug"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -13,10 +14,20 @@ import (
 // Recoverer is a function that handles panics.
 type Recoverer = func(*Update, error, string)
 
+// ConfigurationError describes internal configuration error.
+type ConfigurationError struct {
+	s string
+}
+
+func (e *ConfigurationError) Error() string {
+	return e.s
+}
+
 // Mux is a container for handlers.
 type Mux struct {
-	Handlers  []*Handler
-	Recoverer Recoverer
+	Targets      []interface{} // Target can be either Handler or Mux
+	Recoverer    Recoverer
+	GlobalFilter Filter
 }
 
 // NewMux creates new Mux.
@@ -26,7 +37,19 @@ func NewMux() *Mux {
 
 // AddHandler adds handler to Mux.
 func (m *Mux) AddHandler(h *Handler) *Mux {
-	m.Handlers = append(m.Handlers, h)
+	m.Targets = append(m.Targets, h)
+	return m
+}
+
+// AddMux adds nested Mux to this Mux.
+func (m *Mux) AddMux(other *Mux) *Mux {
+	m.Targets = append(m.Targets, other)
+	return m
+}
+
+// SetGlobalFilter sets a filter to be called for every update before any other filters.
+func (m *Mux) SetGlobalFilter(filter Filter) *Mux {
+	m.GlobalFilter = filter
 	return m
 }
 
@@ -51,13 +74,26 @@ func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
 		// TODO: what if err is string?
 	}()
 
-	for _, handler := range m.Handlers {
-		accepted := handler.Filter(&uu)
-		if accepted {
-			handler.Handle(&uu)
-			return true
-		} else if uu.Consumed {
-			return true
+	if m.GlobalFilter != nil && !m.GlobalFilter(&uu) {
+		return false
+	}
+
+	for _, target := range m.Targets {
+		switch target := target.(type) {
+		case *Mux:
+			if target.Dispatch(bot, u) {
+				return true
+			}
+		case *Handler:
+			accepted := target.Filter(&uu)
+			if uu.Consumed {
+				return true
+			} else if accepted {
+				target.Handle(&uu)
+				return true
+			}
+		default:
+			panic(&ConfigurationError{fmt.Sprintf("%T is not an instance of telemux.Handler or telemux.Mux: %V", target, target)})
 		}
 	}
 	return false

@@ -55,9 +55,9 @@ func NewConversationHandler(
 			defer func() { u.PersistenceContext = nil }()
 			for _, handler := range candidates {
 				accepted := handler.Filter(u)
-				if accepted {
+				if u.Consumed {
 					return true
-				} else if u.Consumed {
+				} else if accepted {
 					return true
 				}
 			}

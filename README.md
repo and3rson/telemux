@@ -118,6 +118,24 @@ for update := range updates {
 }
 ```
 
+You can also nest Mux instances:
+
+```go
+// See "Handlers & filters" section below for more info on filters.
+mux_a := tm.NewMux().
+    SetGlobalFilter(tm.IsPrivate()).
+    AddHandler(/* ... */).
+    AddHandler(/* ... */)
+mux_b := tm.NewMux().
+    SetGlobalFilter(tm.IsGroupOrSuperGroup()).
+    AddHandler(/* ... */).
+    AddHandler(/* ... */)
+mux = tm.NewMux().
+    AddMux(mux_a).
+    AddMux(mux_b).
+    AddHandler(/* ... */)
+```
+
 ## Handlers & filters
 
 Handler consists of filter and handle-function.
@@ -129,6 +147,9 @@ Filters are divided in two groups: content filters (starting with "Has", such as
 and update type filters (starting with "Is", such as `IsEditedMessage()`, `IsInlineQuery()` or `IsGroupOrSuperGroup()`).
 
 There is also a special filter `Any()` which makes handler accept all updates.
+
+Filters can also be applied to the Mux instance using `mux.SetGlobalFilter(filter)`.
+Such filters will be called for every update before any other filters.
 
 ### Combining filters
 
