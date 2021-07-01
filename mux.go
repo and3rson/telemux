@@ -63,23 +63,25 @@ func (m *Mux) SetRecoverer(recoverer Recoverer) *Mux {
 	return m
 }
 
+func (m *Mux) tryRecover(u *Update) {
+	if r := recover(); r != nil {
+		err, ok := r.(error)
+		if !ok {
+			err = fmt.Errorf("%v", err)
+		}
+		if m.Recoverer != nil {
+			m.Recoverer(u, err, string(debug.Stack()))
+		} else {
+			panic(err)
+		}
+	}
+}
+
 // Dispatch tells Mux to process the update.
 func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
 	uu := Update{u, bot, false, nil}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err, ok := r.(error)
-			if !ok {
-				err = fmt.Errorf("%v", err)
-			}
-			if m.Recoverer != nil {
-				m.Recoverer(&uu, err, string(debug.Stack()))
-			} else {
-				panic(err)
-			}
-		}
-	}()
+	defer m.tryRecover(&uu)
 
 	if m.GlobalFilter != nil && !m.GlobalFilter(&uu) {
 		return false
