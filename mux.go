@@ -36,14 +36,18 @@ func NewMux() *Mux {
 }
 
 // AddHandler adds handler to Mux.
-func (m *Mux) AddHandler(h ...*Handler) *Mux {
-	m.Targets = append(m.Targets, h)
+func (m *Mux) AddHandler(handlers ...*Handler) *Mux {
+	for _, handler := range handlers {
+		m.Targets = append(m.Targets, handler)
+	}
 	return m
 }
 
 // AddMux adds nested Mux to this Mux.
-func (m *Mux) AddMux(other ...*Mux) *Mux {
-	m.Targets = append(m.Targets, other)
+func (m *Mux) AddMux(others ...*Mux) *Mux {
+	for _, other := range others {
+		m.Targets = append(m.Targets, other)
+	}
 	return m
 }
 
