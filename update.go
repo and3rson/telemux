@@ -15,7 +15,7 @@ type Update struct {
 	PersistenceContext *PersistenceContext
 }
 
-// Consume marks update as processed. Used by filters to interrupt further processing of the update.
+// Consume marks update as processed. Used by handler functions to interrupt further processing of the update.
 func (u *Update) Consume() {
 	u.Consumed = true
 }

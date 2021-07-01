@@ -74,50 +74,54 @@ func main() {
 				))
 			},
 		)).
-		AddHandler(tm.NewAsyncHandler(
+		AddHandler(tm.NewHandler(
 			tm.IsCommandMessage("cat"),
 			func(u *tm.Update) {
-				bot.Send(tgbotapi.NewChatAction(u.Message.Chat.ID, tgbotapi.ChatTyping))
-				url, err := GetRandomCatURL()
-				if err != nil {
-					bot.Send(tgbotapi.NewMessage(
+				go func() {
+					bot.Send(tgbotapi.NewChatAction(u.Message.Chat.ID, tgbotapi.ChatTyping))
+					url, err := GetRandomCatURL()
+					if err != nil {
+						bot.Send(tgbotapi.NewMessage(
+							u.Message.Chat.ID,
+							fmt.Sprintf("Oops, an error occurred: %s", err),
+						))
+						return
+					}
+					message := tgbotapi.NewMessage(
 						u.Message.Chat.ID,
-						fmt.Sprintf("Oops, an error occurred: %s", err),
-					))
-					return
-				}
-				message := tgbotapi.NewMessage(
-					u.Message.Chat.ID,
-					url,
-				)
-				message.ReplyMarkup = refreshMarkup
-				bot.Send(message)
+						url,
+					)
+					message.ReplyMarkup = refreshMarkup
+					bot.Send(message)
+				}()
 			},
 		)).
-		AddHandler(tm.NewAsyncHandler(
+		AddHandler(tm.NewHandler(
 			tm.IsCallbackQuery(),
 			func(u *tm.Update) {
-				bot.AnswerCallbackQuery(tgbotapi.NewCallback(u.CallbackQuery.ID, "Refreshing..."))
-				bot.Send(tgbotapi.NewEditMessageReplyMarkup(
-					u.CallbackQuery.Message.Chat.ID,
-					u.CallbackQuery.Message.MessageID,
-					loadingMarkup,
-				))
-				bot.Send(tgbotapi.NewChatAction(u.CallbackQuery.Message.Chat.ID, tgbotapi.ChatTyping))
-				url, err := GetRandomCatURL()
-				if err != nil {
-					bot.Send(tgbotapi.NewMessage(
-						u.Message.Chat.ID,
-						fmt.Sprintf("Oops, an error occurred: %s", err),
+				go func() {
+					bot.AnswerCallbackQuery(tgbotapi.NewCallback(u.CallbackQuery.ID, "Refreshing..."))
+					bot.Send(tgbotapi.NewEditMessageReplyMarkup(
+						u.CallbackQuery.Message.Chat.ID,
+						u.CallbackQuery.Message.MessageID,
+						loadingMarkup,
 					))
-				}
-				edit := tgbotapi.NewEditMessageText(
-					u.CallbackQuery.Message.Chat.ID,
-					u.CallbackQuery.Message.MessageID,
-					url,
-				)
-				edit.ReplyMarkup = &refreshMarkup
-				bot.Send(edit)
+					bot.Send(tgbotapi.NewChatAction(u.CallbackQuery.Message.Chat.ID, tgbotapi.ChatTyping))
+					url, err := GetRandomCatURL()
+					if err != nil {
+						bot.Send(tgbotapi.NewMessage(
+							u.Message.Chat.ID,
+							fmt.Sprintf("Oops, an error occurred: %s", err),
+						))
+					}
+					edit := tgbotapi.NewEditMessageText(
+						u.CallbackQuery.Message.Chat.ID,
+						u.CallbackQuery.Message.MessageID,
+						url,
+					)
+					edit.ReplyMarkup = &refreshMarkup
+					bot.Send(edit)
+				}()
 			},
 		))
 	for update := range updates {

@@ -17,8 +17,7 @@ Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-t
   - [Mux](#mux)
   - [Handlers & filters](#handlers--filters)
     - [Combining filters](#combining-filters)
-    - [Asynchronous handlers](#asynchronous-handlers)
-    - [Consuming update from filters](#consuming-update-from-filters)
+    - [Reusable handler functions](#reusable-handler-functions)
   - [Conversations & persistence](#conversations--persistence)
   - [Error handling](#error-handling)
 - [Tips & common pitfalls](#tips--common-pitfalls)
@@ -174,55 +173,37 @@ mux.AddHandler(tm.NewHandler(
 ))
 ```
 
-### Asynchronous handlers
+### Reusable handler functions
 
-If you want your handler to be executed in a goroutine, use `tm.NewAsyncHandler`. It's similar to wrapping a handler function in an anonymous goroutine invocation:
+`mux.NewHandler` can accept more than one handler function. They are all executed sequentially. The chain can
+be interrupted by any of them by calling `u.Consume()`.
 
-```go
-mux := tm.NewMux()
-// Option 1: using NewAsyncHandler
-mux.AddHandler(tm.NewAsyncHandler(
-    tm.IsCommandMessage("do_work"),
-    func(u *tm.Update) {
-        // Slow operation
-    },
-))
-// Option 2: wrapping manually
-mus.AddHandler(tm.NewHandler(
-    tm.IsCommandMessage("do_work"),
-    func(u *tm.Update) {
-        go func() {
-            // Slow operation
-        }
-    },
-))
-```
-
-### Consuming update from filters
-
-Although main purpose of filters is to decide whether a handler can process an update, there are often situations
-when a filter needs to mark update as "consumed" (i. e. "processed") and prevent its further processing *without actually invoking the handler*.
-In this case filters can call `u.Consume()` on Update and return `false`. This will prevent handler from executing and also
-prevent `Mux` from going further down the handler chain. Here's an example:
+Here is an example:
 
 ```go
 mux.AddHandler(tm.NewHandler(
     tm.IsCommandMessage("do_work"),
     func(u *tm.Update) {
+        // Perform necessary check
         if u.EffectiveUser().ID != 3442691337 { // Boilerplate code that will be copy-pasted way too much
             u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "You are not allowed to ask me to work!"))
+            // Stop handling
             return
         }
+        // Perform another check
         if !u.EffectiveChat().IsPrivate() { // Another boilerplate code
             u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
+            // Stop handling
             return
         }
-        // Do actual work
+        // All checks passed, do some actual work
+        // ...
     },
 ))
 ```
 
-To avoid repeating boilerplate checks like `if user is not "3442691337" then send error and stop`, you can "consume" the update from within a filter.
+To avoid repeating boilerplate checks like `if user is not "3442691337" then send error and stop`, you can move them to separate functions.
+
 The above code can be rewritten as follows:
 
 ```go
@@ -230,17 +211,15 @@ The above code can be rewritten as follows:
 func CheckAdmin(u *tm.Update) {
     if u.EffectiveUser().ID != 3442691337 {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "You are not allowed to ask me to work!"))
-        u.Consume() // Mark update as consumed
-        return false
+        u.Consume() // Mark update as consumed. Following handler functions will not be called.
     }
-    return true
 }
 
 // CheckPrivate is a reusable filter that not only checks for private chat but marks update as processed as well
 func CheckPrivate(u *tm.Update) {
     if !u.EffectiveChat().IsPrivate() {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
-        u.Consume() // Mark update as consumed
+        u.Consume() // Mark update as consumed. Following handler functions will not be called.
         return false
     }
     return true
@@ -249,7 +228,9 @@ func CheckPrivate(u *tm.Update) {
 // ...
 
 mux.AddHandler(tm.NewHandler(
-    And(tm.IsCommandMessage("do_work"), CheckAdmin, CheckPrivate),
+    tm.IsCommandMessage("do_work"),
+    CheckAdmin,
+    CheckPrivate,
     func(u *tm.Update) {
         // Do actual work
     },
@@ -262,25 +243,24 @@ mux.AddHandler(tm.NewHandler(
 ))
 ```
 
-You can implement some more complex filters, for example, a parametrized one:
+You can implement some more complex handler functions, for example, a parametrized one:
 
 ```go
 // CheckUserID checks for specific user ID and marks update processed if check fails
-func CheckUserID(userID int) tm.Filter {
+func RequireUserID(userID int) tm.HandleFunc {
     return func(u *tm.Update) {
         if u.EffectuveUser().ID != userID {
             u.Bot.Send(tgbotapi.NewMessage(u.EffectiveChat().ID, "Sorry, I don't know you!"))
             u.Consume()
-            return false
         }
-        return true
     }
 }
 
 // ...
 
 mux.AddHandler(tm.NewHandler(
-    And(tm.IsCommandMessage("do_work"), CheckUserID(3442691337)),
+    tm.IsCommandMessage("do_work"),
+    RequireUserID(3442691337),
     func(u *tm.Update) {
         // Do actual work
     },
@@ -317,7 +297,7 @@ To create a ConversationHandler you need to provide the following:
     States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at.
     Empty string (`""`) shoulb be used as an initial/final state (i. e. if the conversation has not started yet or has already finished.)
 
-    For each state you can provide a list of at least one Handler. If none of the handlers can handle the update, the default handlers are attempted (see below).
+    For each state you must provide a slice with at least one Handler. If none of the handlers can handle the update, the default handlers are attempted (see below).
 
     In order to switch to a different state your Handler must call `u.PersistenceContext.SetState("STATE_NAME") ` replacing STATE_NAME with the name of the state you want to switch into.
 

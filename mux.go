@@ -27,7 +27,7 @@ func (e *ConfigurationError) Error() string {
 type Mux struct {
 	Targets      []interface{} // Target can be either Handler or Mux
 	Recoverer    Recoverer
-	GlobalFilter Filter
+	GlobalFilter FilterFunc
 }
 
 // NewMux creates new Mux.
@@ -52,7 +52,7 @@ func (m *Mux) AddMux(others ...*Mux) *Mux {
 }
 
 // SetGlobalFilter sets a filter to be called for every update before any other filters.
-func (m *Mux) SetGlobalFilter(filter Filter) *Mux {
+func (m *Mux) SetGlobalFilter(filter FilterFunc) *Mux {
 	m.GlobalFilter = filter
 	return m
 }
@@ -68,14 +68,17 @@ func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
 	uu := Update{u, bot, false, nil}
 
 	defer func() {
-		if err, ok := recover().(error); ok {
+		if r := recover(); r != nil {
+			err, ok := r.(error)
+			if !ok {
+				err = fmt.Errorf("%v", err)
+			}
 			if m.Recoverer != nil {
-				m.Recoverer(&uu, error(err), string(debug.Stack()))
+				m.Recoverer(&uu, err, string(debug.Stack()))
 			} else {
 				panic(err)
 			}
 		}
-		// TODO: what if err is string?
 	}()
 
 	if m.GlobalFilter != nil && !m.GlobalFilter(&uu) {
@@ -89,15 +92,14 @@ func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
 				return true
 			}
 		case *Handler:
-			accepted := target.Filter(&uu)
-			if uu.Consumed {
-				return true
-			} else if accepted {
-				target.Handle(&uu)
+			if target.Filter(&uu) {
+				for i := 0; i < len(target.Handles) && !uu.Consumed; i++ {
+					target.Handles[i](&uu)
+				}
 				return true
 			}
 		default:
-			panic(&ConfigurationError{fmt.Sprintf("%T is not an instance of telemux.Handler or telemux.Mux: %V", target, target)})
+			panic(&ConfigurationError{fmt.Sprintf("%T is not an instance of telemux.Handler or telemux.Mux: %v", target, target)})
 		}
 	}
 	return false

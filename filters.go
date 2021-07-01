@@ -5,53 +5,53 @@ import (
 	"strings"
 )
 
-// Filter checks Update and returns true if the update satisfies this filter.
-type Filter func(u *Update) bool
+// FilterFunc checks Update and returns true if the update satisfies this filter.
+type FilterFunc func(u *Update) bool
 
 // Any tells handler to process all updates.
-func Any() Filter {
+func Any() FilterFunc {
 	return func(u *Update) bool {
 		return true
 	}
 }
 
 // IsMessage filters updates that look like message (text, photo, location etc.)
-func IsMessage() Filter {
+func IsMessage() FilterFunc {
 	return func(u *Update) bool {
 		return u.Message != nil
 	}
 }
 
 // IsInlineQuery filters updates that are callbacks from inline queries.
-func IsInlineQuery() Filter {
+func IsInlineQuery() FilterFunc {
 	return func(u *Update) bool {
 		return u.InlineQuery != nil
 	}
 }
 
 // IsCallbackQuery filters updates that are callbacks from button presses.
-func IsCallbackQuery() Filter {
+func IsCallbackQuery() FilterFunc {
 	return func(u *Update) bool {
 		return u.CallbackQuery != nil
 	}
 }
 
 // IsEditedMessage filters updates that are edits to existing messages.
-func IsEditedMessage() Filter {
+func IsEditedMessage() FilterFunc {
 	return func(u *Update) bool {
 		return u.EditedMessage != nil
 	}
 }
 
 // IsChannelPost filters updates that are channel posts.
-func IsChannelPost() Filter {
+func IsChannelPost() FilterFunc {
 	return func(u *Update) bool {
 		return u.ChannelPost != nil
 	}
 }
 
 // IsEditedChannelPost filters updates that are edits to existing channel posts.
-func IsEditedChannelPost() Filter {
+func IsEditedChannelPost() FilterFunc {
 	return func(u *Update) bool {
 		return u.EditedChannelPost != nil
 	}
@@ -59,7 +59,7 @@ func IsEditedChannelPost() Filter {
 
 // HasText filters updates that look like text,
 // i. e. have some text and do not start with a slash ("/").
-func HasText() Filter {
+func HasText() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Text != "" && message.Text[0] != '/'
@@ -69,7 +69,7 @@ func HasText() Filter {
 // IsAnyCommandMessage filters updates that look like a command,
 // i. e. have some text and start with a slash ("/").
 // It also filters new message and excludes edited messages, channel posts, callback queries etc.
-func IsAnyCommandMessage() Filter {
+func IsAnyCommandMessage() FilterFunc {
 	return func(u *Update) bool {
 		// TODO: handle stuff like /unknown_command@bot_name
 		return u.Message != nil && u.Message.Text != "" && u.Message.Text[0] == '/'
@@ -81,7 +81,7 @@ func IsAnyCommandMessage() Filter {
 // This will also allow the user to pass arguments, e. g. "/start foo bar".
 // Commands in format "/start@bot_name" and "/start@bot_name foo bar" are also supported.
 // It also filters only new messages (edited messages, channel posts, callback queries etc are all excluded.)
-func IsCommandMessage(cmd string) Filter {
+func IsCommandMessage(cmd string) FilterFunc {
 	return And(IsMessage(), func(u *Update) bool {
 		patterns := []string{cmd, cmd + "@" + u.Bot.Self.UserName}
 		for _, pattern := range patterns {
@@ -95,7 +95,7 @@ func IsCommandMessage(cmd string) Filter {
 
 // HasRegex filters updates that match a regular expression.
 // For example, HasRegex("^/get_(\d+)$") will handle commands like "/get_42".
-func HasRegex(pattern string) Filter {
+func HasRegex(pattern string) FilterFunc {
 	exp := regexp.MustCompile(pattern)
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
@@ -104,7 +104,7 @@ func HasRegex(pattern string) Filter {
 }
 
 // HasPhoto filters updates that contain a photo.
-func HasPhoto() Filter {
+func HasPhoto() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Photo != nil
@@ -112,7 +112,7 @@ func HasPhoto() Filter {
 }
 
 // HasVoice filters updates that contain a voice message.
-func HasVoice() Filter {
+func HasVoice() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Voice != nil
@@ -120,7 +120,7 @@ func HasVoice() Filter {
 }
 
 // HasAudio filters updates that contain an audio.
-func HasAudio() Filter {
+func HasAudio() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Audio != nil
@@ -128,7 +128,7 @@ func HasAudio() Filter {
 }
 
 // HasAnimation filters updates that contain an animation.
-func HasAnimation() Filter {
+func HasAnimation() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Animation != nil
@@ -136,7 +136,7 @@ func HasAnimation() Filter {
 }
 
 // HasDocument filters updates that contain a document.
-func HasDocument() Filter {
+func HasDocument() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Document != nil
@@ -144,7 +144,7 @@ func HasDocument() Filter {
 }
 
 // HasSticker filters updates that contain a sticker.
-func HasSticker() Filter {
+func HasSticker() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Sticker != nil
@@ -152,7 +152,7 @@ func HasSticker() Filter {
 }
 
 // HasVideo filters updates that contain a video.
-func HasVideo() Filter {
+func HasVideo() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Video != nil
@@ -160,7 +160,7 @@ func HasVideo() Filter {
 }
 
 // HasVideoNote filters updates that contain a video note.
-func HasVideoNote() Filter {
+func HasVideoNote() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.VideoNote != nil
@@ -168,7 +168,7 @@ func HasVideoNote() Filter {
 }
 
 // HasContact filters updates that contain a contact.
-func HasContact() Filter {
+func HasContact() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Contact != nil
@@ -176,7 +176,7 @@ func HasContact() Filter {
 }
 
 // HasLocation filters updates that contain a location.
-func HasLocation() Filter {
+func HasLocation() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Location != nil
@@ -184,7 +184,7 @@ func HasLocation() Filter {
 }
 
 // HasVenue filters updates that contain a venue.
-func HasVenue() Filter {
+func HasVenue() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
 		return message != nil && message.Venue != nil
@@ -192,7 +192,7 @@ func HasVenue() Filter {
 }
 
 // IsPrivate filters updates that are sent in private chats.
-func IsPrivate() Filter {
+func IsPrivate() FilterFunc {
 	return func(u *Update) bool {
 		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsPrivate()
@@ -202,7 +202,7 @@ func IsPrivate() Filter {
 }
 
 // IsGroup filters updates that are sent in a group. See also IsGroupOrSuperGroup.
-func IsGroup() Filter {
+func IsGroup() FilterFunc {
 	return func(u *Update) bool {
 		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsGroup()
@@ -212,7 +212,7 @@ func IsGroup() Filter {
 }
 
 // IsSuperGroup filters updates that are sent in a superbroup. See also IsGroupOrSuperGroup.
-func IsSuperGroup() Filter {
+func IsSuperGroup() FilterFunc {
 	return func(u *Update) bool {
 		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsSuperGroup()
@@ -222,7 +222,7 @@ func IsSuperGroup() Filter {
 }
 
 // IsGroupOrSuperGroup filters updates that are sent in both groups and supergroups.
-func IsGroupOrSuperGroup() Filter {
+func IsGroupOrSuperGroup() FilterFunc {
 	return func(u *Update) bool {
 		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsGroup() || chat.IsSuperGroup()
@@ -232,7 +232,7 @@ func IsGroupOrSuperGroup() Filter {
 }
 
 // IsChannel filters updates that are sent in channels.
-func IsChannel() Filter {
+func IsChannel() FilterFunc {
 	return func(u *Update) bool {
 		if chat := u.EffectiveChat(); chat != nil {
 			return chat.IsChannel()
@@ -242,7 +242,7 @@ func IsChannel() Filter {
 }
 
 // IsNewChatMembers filters updates that have users in NewChatMembers property.
-func IsNewChatMembers() Filter {
+func IsNewChatMembers() FilterFunc {
 	return func(u *Update) bool {
 		if message := u.EffectiveMessage(); message != nil {
 			return message.NewChatMembers != nil && len(*message.NewChatMembers) > 0
@@ -252,7 +252,7 @@ func IsNewChatMembers() Filter {
 }
 
 // IsLeftChatMember filters updates that have user in LeftChatMember property.
-func IsLeftChatMember() Filter {
+func IsLeftChatMember() FilterFunc {
 	return func(u *Update) bool {
 		if message := u.EffectiveMessage(); message != nil {
 			return message.LeftChatMember != nil
@@ -262,7 +262,7 @@ func IsLeftChatMember() Filter {
 }
 
 // And filters updates that pass ALL of the provided filters.
-func And(filters ...Filter) Filter {
+func And(filters ...FilterFunc) FilterFunc {
 	return func(u *Update) bool {
 		for _, filter := range filters {
 			if !filter(u) {
@@ -274,7 +274,7 @@ func And(filters ...Filter) Filter {
 }
 
 // Or filters updates that pass ANY of the provided filters.
-func Or(filters ...Filter) Filter {
+func Or(filters ...FilterFunc) FilterFunc {
 	return func(u *Update) bool {
 		for _, filter := range filters {
 			if filter(u) {
@@ -286,7 +286,7 @@ func Or(filters ...Filter) Filter {
 }
 
 // Not filters updates that do not pass the provided filter.
-func Not(filter Filter) Filter {
+func Not(filter FilterFunc) FilterFunc {
 	return func(u *Update) bool {
 		return !filter(u)
 	}
