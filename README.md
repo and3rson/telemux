@@ -314,12 +314,12 @@ See [./examples/album_conversation/main.go](./examples/album_conversation/main.g
 
 By default, panics in handlers are propagated all the way to the top (`Dispatch` method).
 
-In order to intercept all panics in your handlers globally and handle them gracefully, register your function using `SetRecoverer`:
+In order to intercept all panics in your handlers globally and handle them gracefully, register your function using `SetRecover`:
 
 ```go
 mux := tm.NewMux()
 # ...
-mux.SetRecoverer(func(u *tm.Update, err error, stackTrace string) {
+mux.SetRecover(func(u *tm.Update, err error, stackTrace string) {
     fmt.Printf("An error occurred: %s\n\nStack trace:\n%s", err, stackTrace)
 })
 ```

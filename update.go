@@ -12,6 +12,7 @@ type Update struct {
 	Bot                *tgbotapi.BotAPI
 	Consumed           bool
 	PersistenceContext *PersistenceContext
+	Context            map[string]interface{}
 }
 
 // Consume marks update as processed. Used by handler functions to interrupt further processing of the update.

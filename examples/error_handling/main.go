@@ -49,7 +49,7 @@ func main() {
 				))
 			},
 		)).
-		SetRecoverer(func(u *tm.Update, err error, stackTrace string) {
+		SetRecover(func(u *tm.Update, err error, stackTrace string) {
 			chat := u.EffectiveChat()
 			if chat != nil {
 				bot.Send(tgbotapi.NewMessage(

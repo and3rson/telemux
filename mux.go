@@ -11,8 +11,8 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-// Recoverer is a function that handles panics which happen during Dispatch.
-type Recoverer = func(*Update, error, string)
+// RecoverFunc handles panics which happen during Dispatch.
+type RecoverFunc = func(*Update, error, string)
 
 type processor interface {
 	process(u *Update) bool
@@ -21,7 +21,7 @@ type processor interface {
 // Mux contains handlers, nested multiplexers and global filter.
 type Mux struct {
 	processors   []processor // Contains instances of Mux & Handler
-	Recoverer    Recoverer
+	Recover      RecoverFunc
 	GlobalFilter FilterFunc
 }
 
@@ -55,10 +55,10 @@ func (m *Mux) SetGlobalFilter(filter FilterFunc) *Mux {
 	return m
 }
 
-// SetRecoverer registers a function to call when a panic occurs.
+// SetRecover registers a function to call when a panic occurs.
 // This function returns the receiver for convenient chaining.
-func (m *Mux) SetRecoverer(recoverer Recoverer) *Mux {
-	m.Recoverer = recoverer
+func (m *Mux) SetRecover(recover_ RecoverFunc) *Mux {
+	m.Recover = recover_
 	return m
 }
 
@@ -68,8 +68,8 @@ func (m *Mux) tryRecover(u *Update) {
 		if !ok {
 			err = fmt.Errorf("%v", err)
 		}
-		if m.Recoverer != nil {
-			m.Recoverer(u, err, string(debug.Stack()))
+		if m.Recover != nil {
+			m.Recover(u, err, string(debug.Stack()))
 		} else {
 			panic(err)
 		}
@@ -79,7 +79,7 @@ func (m *Mux) tryRecover(u *Update) {
 // Dispatch tells Mux to process the update.
 // Returns true if the update was processed by one of the handlers.
 func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
-	return m.process(&Update{u, bot, false, nil})
+	return m.process(&Update{u, bot, false, nil, make(map[string]interface{})})
 }
 
 func (m *Mux) process(u *Update) bool {
