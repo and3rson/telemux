@@ -220,9 +220,7 @@ func CheckPrivate(u *tm.Update) {
     if !u.EffectiveChat().IsPrivate() {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
         u.Consume() // Mark update as consumed. Following handler functions will not be called.
-        return false
     }
-    return true
 }
 
 // ...
