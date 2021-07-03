@@ -207,7 +207,7 @@ To avoid repeating boilerplate checks like `if user is not "3442691337" then sen
 The above code can be rewritten as follows:
 
 ```go
-// CheckAdmin is a reusable filter that not only checks for user's ID but marks update as processed as well
+// CheckAdmin is a reusable handler that not only checks for user's ID but marks update as processed as well
 func CheckAdmin(u *tm.Update) {
     if u.EffectiveUser().ID != 3442691337 {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "You are not allowed to ask me to work!"))
@@ -215,7 +215,7 @@ func CheckAdmin(u *tm.Update) {
     }
 }
 
-// CheckPrivate is a reusable filter that not only checks for private chat but marks update as processed as well
+// CheckPrivate is a reusable handler that not only checks for private chat but marks update as processed as well
 func CheckPrivate(u *tm.Update) {
     if !u.EffectiveChat().IsPrivate() {
         u.Bot.Send(tgbotapi.Message(u.EffectiveChat().ID, "I do not accept commands in group chats. Send me a PM."))
@@ -238,7 +238,7 @@ mux.AddHandler(tm.NewHandler(
 mux.AddHandler(tm.NewHandler(
     tm.IsCommandMessage("other_command")),
     func(u *tm.Update) {
-        // This handler will not fire if one of previous filters (CheckAdmin or CheckPrivate) consumed the update.
+        // This handler will not fire if one of previous handlers (CheckAdmin or CheckPrivate) consumed the update.
     },
 ))
 ```
