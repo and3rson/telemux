@@ -76,12 +76,12 @@ func (k *PersistenceKey) UnmarshalText(b []byte) error {
 
 	chatID, err := strconv.ParseInt(chatIDstr, 10, 64)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	k.ChatID = chatID
 	userID, err := strconv.Atoi(userIDstr)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	k.UserID = userID
 	return nil

@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	tm "github.com/and3rson/telemux"
@@ -165,4 +166,51 @@ func TestConversationHandler(t *testing.T) {
 	assert(h.Process(NewUpdate("/cancel")), t, "/cancel must be processed")
 	assert(p.GetState(pk) == "", t, "State must be empty, have", p.GetState(pk))
 	assert(reflect.DeepEqual(p.GetData(pk), map[string]interface{}{}), t, "Persistence data must be empty")
+}
+
+func TestConvenienceHandlers(t *testing.T) {
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewInlineQueryHandler(nil, func(u *tm.Update) {}).Filter),
+		"IsInlineQuery.func1",
+	), t)
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewInlineQueryHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		"And.func1",
+	), t)
+
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewCallbackQueryHandler(nil, func(u *tm.Update) {}).Filter),
+		"IsCallbackQuery.func1",
+	), t)
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewCallbackQueryHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		"And.func1",
+	), t)
+
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewEditedMessageHandler(nil, func(u *tm.Update) {}).Filter),
+		"IsEditedMessage.func1",
+	), t)
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewEditedMessageHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		"And.func1",
+	), t)
+
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewChannelPostHandler(nil, func(u *tm.Update) {}).Filter),
+		"IsChannelPost.func1",
+	), t)
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewChannelPostHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		"And.func1",
+	), t)
+
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewEditedChannelPostHandler(nil, func(u *tm.Update) {}).Filter),
+		"IsEditedChannelPost.func1",
+	), t)
+	assert(strings.HasSuffix(
+		getFunctionName(tm.NewEditedChannelPostHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		"And.func1",
+	), t)
 }
