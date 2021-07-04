@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.8.2
+
+- `readme`: **add** info on update type handlers
+- `handlers`: **add** missing filter arg to NewCommandHandler
+
+## v1.8.1
+
+- `persistence`: **fix** PersistenceKey error reporting during unmarshal error
+- `global`: **add** tests, increase coverage to 98.3%
+
+## v1.8.0
+
+- .travis.yml: add coverage collection for codeclimate
+- `readme`: **add** coverage badge
+- `filters`: **update** IsCommandMessage & IsAnyCommandMessage to use regex
+- `mux`: **make** Processor public for testing convenience
+- `global`: **add** unit tests for the most important functionality
+
+## v1.7.0
+
+- `readme`: **update** docs on recovering
+- `examples`: **update** recover usage
+- `mux`: **rename** Recoverer/SetRecoverer to Recover/SetRecover
+- `update`: **add** Context to Update
+- `mux`: **add** processor interface
+- `mux`: **make** Mux implement processor
+- `handlers`: **make** Handler implement processor
+
 ## v1.6.0
 
 - `readme`: **drop** async handlers section
