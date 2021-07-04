@@ -1,5 +1,7 @@
 exclude_patterns:
   - "examples/"
+  - "*_test.go"
+  - "**/*_test.go"
 checks:
   nested-control-flow:
     enabled: true
