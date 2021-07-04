@@ -2,11 +2,12 @@ package telemux
 
 import (
 	"regexp"
-	"strings"
 )
 
 // FilterFunc is used to check if this update should be processed by handler.
 type FilterFunc func(u *Update) bool
+
+var commandRegex = regexp.MustCompile("^/([0-9a-zA-Z_]+)(@[0-9a-zA-Z_]{3,})?")
 
 // Any tells handler to process all updates.
 func Any() FilterFunc {
@@ -66,30 +67,33 @@ func HasText() FilterFunc {
 	}
 }
 
-// IsAnyCommandMessage filters updates that look like a command,
+// IsAnyCommandMessage filters updates that contain a message and look like a command,
 // i. e. have some text and start with a slash ("/").
-// It also filters new message and excludes edited messages, channel posts, callback queries etc.
+// If command contains bot username, it is also checked.
 func IsAnyCommandMessage() FilterFunc {
-	return func(u *Update) bool {
-		// TODO: handle stuff like /unknown_command@bot_name
-		return u.Message != nil && u.Message.Text != "" && u.Message.Text[0] == '/'
-	}
+	return And(IsMessage(), func(u *Update) bool {
+		matches := commandRegex.FindStringSubmatch(u.Message.Text)
+		if len(matches) == 0 {
+			return false
+		}
+		botName := matches[2]
+		if botName != "" && botName != "@"+u.Bot.Self.UserName {
+			return false
+		}
+		return true
+	})
 }
 
 // IsCommandMessage filters updates that contain a specific command.
 // For example, IsCommandMessage("start") will handle a "/start" command.
 // This will also allow the user to pass arguments, e. g. "/start foo bar".
 // Commands in format "/start@bot_name" and "/start@bot_name foo bar" are also supported.
-// It also filters only new messages (edited messages, channel posts, callback queries etc are all excluded.)
+// If command contains bot username, it is also checked.
 func IsCommandMessage(cmd string) FilterFunc {
-	return And(IsMessage(), func(u *Update) bool {
-		patterns := []string{cmd, cmd + "@" + u.Bot.Self.UserName}
-		for _, pattern := range patterns {
-			if u.Message.Text == "/"+pattern || strings.HasPrefix(u.Message.Text, "/"+pattern+" ") {
-				return true
-			}
-		}
-		return false
+	return And(IsAnyCommandMessage(), func(u *Update) bool {
+		matches := commandRegex.FindStringSubmatch(u.Message.Text)
+		actualCmd := matches[1]
+		return actualCmd == cmd
 	})
 }
 

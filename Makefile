@@ -1,16 +1,20 @@
 TAG ?= $(shell git tag --points-at HEAD | grep -v gormpersistence)
 
-all: | test vet lint
+all: | init test vet lint
+
+init:
+	cd /tmp && go get golang.org/x/lint/golint
+	cd /tmp && go get golang.org/x/tools/cmd/cover
 
 test:
-	go test ./...
+	go test ./... -cover -coverprofile c.out -test.v
+	go tool cover -html=c.out -o cover.html
 	make -C gormpersistence test
 
 vet:
 	go vet ./...
 
 lint:
-	cd /tmp && go get golang.org/x/lint/golint
 	golint ./...
 
 announce:

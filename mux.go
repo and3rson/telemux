@@ -14,13 +14,14 @@ import (
 // RecoverFunc handles panics which happen during Dispatch.
 type RecoverFunc = func(*Update, error, string)
 
-type processor interface {
-	process(u *Update) bool
+// Processor is either Handler or Mux.
+type Processor interface {
+	Process(u *Update) bool
 }
 
 // Mux contains handlers, nested multiplexers and global filter.
 type Mux struct {
-	processors   []processor // Contains instances of Mux & Handler
+	Processors   []Processor // Contains instances of Mux & Handler
 	Recover      RecoverFunc
 	GlobalFilter FilterFunc
 }
@@ -34,7 +35,7 @@ func NewMux() *Mux {
 // This function returns the receiver for convenient chaining.
 func (m *Mux) AddHandler(handlers ...*Handler) *Mux {
 	for _, handler := range handlers {
-		m.processors = append(m.processors, handler)
+		m.Processors = append(m.Processors, handler)
 	}
 	return m
 }
@@ -43,7 +44,7 @@ func (m *Mux) AddHandler(handlers ...*Handler) *Mux {
 // This function returns the receiver for convenient chaining.
 func (m *Mux) AddMux(others ...*Mux) *Mux {
 	for _, other := range others {
-		m.processors = append(m.processors, other)
+		m.Processors = append(m.Processors, other)
 	}
 	return m
 }
@@ -57,8 +58,8 @@ func (m *Mux) SetGlobalFilter(filter FilterFunc) *Mux {
 
 // SetRecover registers a function to call when a panic occurs.
 // This function returns the receiver for convenient chaining.
-func (m *Mux) SetRecover(recover_ RecoverFunc) *Mux {
-	m.Recover = recover_
+func (m *Mux) SetRecover(recover RecoverFunc) *Mux {
+	m.Recover = recover
 	return m
 }
 
@@ -66,7 +67,7 @@ func (m *Mux) tryRecover(u *Update) {
 	if r := recover(); r != nil {
 		err, ok := r.(error)
 		if !ok {
-			err = fmt.Errorf("%v", err)
+			err = fmt.Errorf("%v", r)
 		}
 		if m.Recover != nil {
 			m.Recover(u, err, string(debug.Stack()))
@@ -79,18 +80,19 @@ func (m *Mux) tryRecover(u *Update) {
 // Dispatch tells Mux to process the update.
 // Returns true if the update was processed by one of the handlers.
 func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
-	return m.process(&Update{u, bot, false, nil, make(map[string]interface{})})
+	return m.Process(&Update{u, bot, false, nil, make(map[string]interface{})})
 }
 
-func (m *Mux) process(u *Update) bool {
+// Process runs mux with provided update.
+func (m *Mux) Process(u *Update) bool {
 	defer m.tryRecover(u)
 
 	if m.GlobalFilter != nil && !m.GlobalFilter(u) {
 		return false
 	}
 
-	for _, processor := range m.processors {
-		if processor.process(u) {
+	for _, Processor := range m.Processors {
+		if Processor.Process(u) {
 			return true
 		}
 	}

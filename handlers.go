@@ -1,5 +1,7 @@
 package telemux
 
+import "strings"
+
 // HandleFunc processes update.
 type HandleFunc func(u *Update)
 
@@ -9,7 +11,8 @@ type Handler struct {
 	Handles []HandleFunc
 }
 
-func (h *Handler) process(u *Update) bool {
+// Process runs handler with provided Update.
+func (h *Handler) Process(u *Update) bool {
 	if h.Filter(u) {
 		for i := 0; i < len(h.Handles) && !u.Consumed; i++ {
 			h.Handles[i](u)
@@ -19,12 +22,82 @@ func (h *Handler) process(u *Update) bool {
 	return false
 }
 
-// NewHandler creates a new handler.
+// NewHandler creates a new generic handler.
 func NewHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
 	if filter == nil {
 		filter = Any()
 	}
 	return &Handler{filter, handles}
+}
+
+// NewMessageHandler creates a handler for updates that contain message.
+func NewMessageHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := IsMessage()
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	return NewHandler(newFilter, handles...)
+}
+
+// NewCommandHandler is an extension for NewMessageHandler that creates a handler for updates that contain message with command.
+// It also populates u.Context["args"] with a slice of strings.
+//
+// For example, when invoked as `/somecmd foo bar 1337`, u.Context["args"] will be set to []string{"foo", "bar", "1337"}
+func NewCommandHandler(command string, handles ...HandleFunc) *Handler {
+	handles = append([]HandleFunc{
+		func(u *Update) {
+			u.Context["args"] = strings.Split(u.Message.Text, " ")[1:]
+		},
+	}, handles...)
+	return NewMessageHandler(
+		IsCommandMessage(command),
+		handles...,
+	)
+}
+
+// NewInlineQueryHandler creates a handler for updates that contain inline query.
+func NewInlineQueryHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := IsInlineQuery()
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	return NewHandler(newFilter, handles...)
+}
+
+// NewCallbackQueryHandler creates a handler for updates that contain callback query.
+func NewCallbackQueryHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := IsCallbackQuery()
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	return NewHandler(newFilter, handles...)
+}
+
+// NewEditedMessageHandler creates a handler for updates that contain edited message.
+func NewEditedMessageHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := IsEditedMessage()
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	return NewHandler(newFilter, handles...)
+}
+
+// NewChannelPostHandler creates a handler for updates that contain channel post.
+func NewChannelPostHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := IsChannelPost()
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	return NewHandler(newFilter, handles...)
+}
+
+// NewEditedChannelPostHandler creates a handler for updates that contain edited channel post.
+func NewEditedChannelPostHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := IsEditedChannelPost()
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	return NewHandler(newFilter, handles...)
 }
 
 // NewConversationHandler creates a conversation handler.
