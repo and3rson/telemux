@@ -43,14 +43,18 @@ func NewMessageHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
 // It also populates u.Context["args"] with a slice of strings.
 //
 // For example, when invoked as `/somecmd foo bar 1337`, u.Context["args"] will be set to []string{"foo", "bar", "1337"}
-func NewCommandHandler(command string, handles ...HandleFunc) *Handler {
+func NewCommandHandler(command string, filter FilterFunc, handles ...HandleFunc) *Handler {
 	handles = append([]HandleFunc{
 		func(u *Update) {
 			u.Context["args"] = strings.Split(u.Message.Text, " ")[1:]
 		},
 	}, handles...)
+	newFilter := IsCommandMessage(command)
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
 	return NewMessageHandler(
-		IsCommandMessage(command),
+		newFilter,
 		handles...,
 	)
 }

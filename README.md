@@ -67,8 +67,8 @@ func main() {
     // If a handler cannot handle the update (fails the filter),
     // multiplexer will proceed to the next handler.
     mux := tm.NewMux().
-        AddHandler(tm.NewHandler(
-            tm.IsCommandMessage("start"),
+        AddHandler(tm.NewCommandHandler(
+            "start",
             func(u *tm.Update) {
                 bot.Send(tgbotapi.NewMessage(u.Message.Chat.ID, "Hello! Say something. :)"))
             },
@@ -148,6 +148,21 @@ There is also a special filter `Any()` which makes handler accept all updates.
 
 Filters can also be applied to the Mux instance using `mux.SetGlobalFilter(filter)`.
 Such filters will be called for every update before any other filters.
+
+Generic handlers can be created with `tm.NewHandler` function, however there are shortcuts for adding update-type-specific handlers:
+
+```go
+tm.NewMessageHandler(tm.HasPhoto(), func(u *tm.Update) { /* ... */ })
+# ...equals to: tm.NewHandler(tm.And(tm.IsMessage(), tm.HasPhoto()), func(u *tm.Update) { /* ... */ })
+
+tm.NewCommandHandler("start", tm.IsPrivate(), func(u *tm.Update) { /* ... */ })
+# ...equals to: tm.NewHandler(tm.And(tm.IsCommandMessage("start"), tm.IsPrivate()), func(u *tm.Update) { /* ... */ })
+
+tm.NewCallbackQueryHandler(nil, func(u *tm.Update) { /* ... */ })
+# ...equals to: tm.NewHandler(tm.IsCallbackQuery(), func(u *tm.Update) { /* ... */ })
+
+# etc.
+```
 
 ### Combining filters
 

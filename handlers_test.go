@@ -19,6 +19,7 @@ func ExampleNewCommandHandler() {
 	mux := tm.NewMux()
 	mux.AddHandler(tm.NewCommandHandler(
 		"add",
+		nil,
 		func(u *tm.Update) {
 			args := u.Context["args"].([]string)
 			if len(args) != 2 {
@@ -69,8 +70,7 @@ func TestHandlerConsume(t *testing.T) {
 }
 
 func TestCommandHandler(t *testing.T) {
-	h := tm.NewCommandHandler("test", func(u *tm.Update) {
-	})
+	h := tm.NewCommandHandler("test", nil, func(u *tm.Update) {})
 	u := &tm.Update{}
 	u.Update.Message = &tgbotapi.Message{}
 	u.Update.Message.Text = "/test foo bar"
@@ -112,7 +112,7 @@ func TestConversationHandler(t *testing.T) {
 		p,
 		map[string][]*tm.Handler{
 			"": {
-				tm.NewCommandHandler("start", func(u *tm.Update) {
+				tm.NewCommandHandler("start", nil, func(u *tm.Update) {
 					u.PersistenceContext.SetState("ask_name")
 				}),
 			},
@@ -133,14 +133,14 @@ func TestConversationHandler(t *testing.T) {
 				}),
 			},
 			"ask_confirm": {
-				tm.NewCommandHandler("confirm", func(u *tm.Update) {
+				tm.NewCommandHandler("confirm", nil, func(u *tm.Update) {
 					u.PersistenceContext.ClearData()
 					u.PersistenceContext.SetState("")
 				}),
 			},
 		},
 		[]*tm.Handler{
-			tm.NewCommandHandler("cancel", func(u *tm.Update) { u.PersistenceContext.SetState(""); u.PersistenceContext.ClearData() }),
+			tm.NewCommandHandler("cancel", nil, func(u *tm.Update) { u.PersistenceContext.SetState(""); u.PersistenceContext.ClearData() }),
 		},
 	)
 	pk := tm.PersistenceKey{"test", 13, 37}
