@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.8.4
+
+- `persistence`: **add** PutDataValue convenience method to PersistenceContext
+
+## v1.8.3
+
+- `handlers`: **add** :enter hook for ConversationHandler state transition
+- `persistence`: **set** NewState during state transition
+
 ## v1.8.2
 
 - `readme`: **add** info on update type handlers
