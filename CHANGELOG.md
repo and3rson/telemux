@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.8.5
+
+- `handlers`: **append** default commands to all states except default
+- `readme`: **update** section about default handlers
+
 ## v1.8.4
 
 - `persistence`: **add** PutDataValue convenience method to PersistenceContext
