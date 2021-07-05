@@ -53,7 +53,7 @@ func (c *PersistenceContext) SetState(state string) {
 }
 
 // PutValueData is a shortcut to insert value into conversation data in one line.
-func (c *PersistenceContext) PutDataValue(key string, value string) {
+func (c *PersistenceContext) PutDataValue(key string, value interface{}) {
 	data := c.GetData()
 	data[key] = value
 	c.SetData(data)
