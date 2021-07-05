@@ -52,6 +52,13 @@ func (c *PersistenceContext) SetState(state string) {
 	c.NewState = &state
 }
 
+// PutValueData is a shortcut to insert value into conversation data in one line.
+func (c *PersistenceContext) PutDataValue(key string, value string) {
+	data := c.GetData()
+	data[key] = value
+	c.SetData(data)
+}
+
 // PersistenceKey contains user & chat IDs. It is used to identify conversations with different users in different chats.
 type PersistenceKey struct {
 	ConversationID string `gorm:"primaryKey;autoIncrement:false"`
