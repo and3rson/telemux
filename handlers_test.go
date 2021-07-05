@@ -178,20 +178,20 @@ func TestConversationHandler(t *testing.T) {
 
 func TestConvenienceHandlers(t *testing.T) {
 	assert(strings.HasSuffix(
-		getFunctionName(tm.NewInlineQueryHandler(nil, func(u *tm.Update) {}).Filter),
-		"IsInlineQuery.func1",
+		getFunctionName(tm.NewInlineQueryHandler(".*", nil, func(u *tm.Update) {}).Filter),
+		"And.func1",
 	), t)
 	assert(strings.HasSuffix(
-		getFunctionName(tm.NewInlineQueryHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		getFunctionName(tm.NewInlineQueryHandler(".*", tm.Any(), func(u *tm.Update) {}).Filter),
 		"And.func1",
 	), t)
 
 	assert(strings.HasSuffix(
-		getFunctionName(tm.NewCallbackQueryHandler(nil, func(u *tm.Update) {}).Filter),
-		"IsCallbackQuery.func1",
+		getFunctionName(tm.NewCallbackQueryHandler(".*", nil, func(u *tm.Update) {}).Filter),
+		"And.func1",
 	), t)
 	assert(strings.HasSuffix(
-		getFunctionName(tm.NewCallbackQueryHandler(tm.Any(), func(u *tm.Update) {}).Filter),
+		getFunctionName(tm.NewCallbackQueryHandler(".*", tm.Any(), func(u *tm.Update) {}).Filter),
 		"And.func1",
 	), t)
 

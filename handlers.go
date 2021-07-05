@@ -1,6 +1,9 @@
 package telemux
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // HandleFunc processes update.
 type HandleFunc func(u *Update)
@@ -59,18 +62,22 @@ func NewCommandHandler(command string, filter FilterFunc, handles ...HandleFunc)
 	)
 }
 
-// NewInlineQueryHandler creates a handler for updates that contain inline query.
-func NewInlineQueryHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
-	newFilter := IsInlineQuery()
+// NewInlineQueryHandler creates a handler for updates that contain inline query which matches the pattern as regexp.
+func NewInlineQueryHandler(pattern string, filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := And(IsInlineQuery(), func(u *Update) bool {
+		return regexp.MustCompile(pattern).Match([]byte(u.InlineQuery.Query))
+	})
 	if filter != nil {
 		newFilter = And(newFilter, filter)
 	}
 	return NewHandler(newFilter, handles...)
 }
 
-// NewCallbackQueryHandler creates a handler for updates that contain callback query.
-func NewCallbackQueryHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
-	newFilter := IsCallbackQuery()
+// NewCallbackQueryHandler creates a handler for updates that contain callback query which matches the pattern as regexp.
+func NewCallbackQueryHandler(pattern string, filter FilterFunc, handles ...HandleFunc) *Handler {
+	newFilter := And(IsCallbackQuery(), func(u *Update) bool {
+		return regexp.MustCompile(pattern).Match([]byte(u.CallbackQuery.Data))
+	})
 	if filter != nil {
 		newFilter = And(newFilter, filter)
 	}
