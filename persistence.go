@@ -28,6 +28,7 @@ type ConversationPersistence interface {
 type PersistenceContext struct {
 	Persistence ConversationPersistence
 	PK          PersistenceKey
+	NewState    *string
 }
 
 // GetData returns data of current conversation.
@@ -48,6 +49,7 @@ func (c *PersistenceContext) ClearData() {
 // SetState changes state of current conversation.
 func (c *PersistenceContext) SetState(state string) {
 	c.Persistence.SetState(c.PK, state)
+	c.NewState = &state
 }
 
 // PersistenceKey contains user & chat IDs. It is used to identify conversations with different users in different chats.

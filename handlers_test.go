@@ -106,6 +106,7 @@ func TestConversationHandler(t *testing.T) {
 		u.Bot.Self.UserName = "testbot"
 		return u
 	}
+	askAgeEntered := false
 	p := tm.NewLocalPersistence()
 	h := tm.NewConversationHandler(
 		"test",
@@ -122,6 +123,11 @@ func TestConversationHandler(t *testing.T) {
 					data["name"] = u.EffectiveMessage().Text
 					u.PersistenceContext.SetData(data)
 					u.PersistenceContext.SetState("ask_age")
+				}),
+			},
+			"ask_age:enter": {
+				tm.NewHandler(nil, func(u *tm.Update) {
+					askAgeEntered = true
 				}),
 			},
 			"ask_age": {
@@ -147,8 +153,10 @@ func TestConversationHandler(t *testing.T) {
 	assert(!h.Process(NewUpdate("just some text")), t, "Random text must be ignored")
 	assert(h.Process(NewUpdate("/start")), t, "/start must be processed")
 	assert(p.GetState(pk) == "ask_name", t, "State must be ask_name, have", p.GetState(pk))
+	assert(!askAgeEntered, t)
 	assert(h.Process(NewUpdate("Foobar")), t, "Name must be processed")
 	assert(p.GetState(pk) == "ask_age", t, "State must be ask_age, have", p.GetState(pk))
+	assert(askAgeEntered, t)
 	assert(reflect.DeepEqual(p.GetData(pk), map[string]interface{}{"name": "Foobar"}), t, "Unexpected persistence data")
 	assert(h.Process(NewUpdate("18")), t, "Age must be processed")
 	assert(p.GetState(pk) == "ask_confirm", t, "State must be ask_confirm, have", p.GetState(pk))

@@ -123,7 +123,8 @@ func NewConversationHandler(
 	states map[string][]*Handler,
 	defaults []*Handler,
 ) *Handler {
-	return &Handler{
+	var handler *Handler
+	handler = &Handler{
 		func(u *Update) bool {
 			user, chat := u.EffectiveUser(), u.EffectiveChat()
 			pk := PersistenceKey{conversationID, user.ID, chat.ID}
@@ -144,11 +145,23 @@ func NewConversationHandler(
 			user, chat := u.EffectiveUser(), u.EffectiveChat()
 			pk := PersistenceKey{conversationID, user.ID, chat.ID}
 			candidates := append(states[persistence.GetState(pk)], defaults...)
-			u.PersistenceContext = &PersistenceContext{
-				Persistence: persistence,
-				PK:          pk,
+			if u.PersistenceContext == nil {
+				u.PersistenceContext = &PersistenceContext{
+					Persistence: persistence,
+					PK:          pk,
+				}
+				defer func() { u.PersistenceContext = nil }()
 			}
-			defer func() { u.PersistenceContext = nil }()
+			defer func() {
+				if u.PersistenceContext.NewState != nil {
+					// TODO: Add docs for :enter hook
+					if handlers, ok := states[*u.PersistenceContext.NewState+":enter"]; ok {
+						for _, handler := range handlers {
+							handler.Process(u)
+						}
+					}
+				}
+			}()
 			for _, handler := range candidates {
 				if handler.Filter(u) {
 					for i := 0; i < len(handler.Handles) && !u.Consumed; i++ {
@@ -159,4 +172,5 @@ func NewConversationHandler(
 			}
 		}},
 	}
+	return handler
 }
