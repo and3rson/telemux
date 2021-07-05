@@ -307,7 +307,7 @@ To create a ConversationHandler you need to provide the following:
 - `states map[string][]*Handler` - defines what handlers to use in which state.
 
     States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at.
-    Empty string (`""`) shoulb be used as an initial/final state (i. e. if the conversation has not started yet or has already finished.)
+    Empty string (`""`) should be used as an initial/final state (i. e. if the conversation has not started yet or has already finished.)
 
     For each state you must provide a slice with at least one Handler. If none of the handlers can handle the update, the default handlers are attempted (see below).
 
