@@ -185,6 +185,17 @@ func TestConvenienceHandlers(t *testing.T) {
 		getFunctionName(tm.NewInlineQueryHandler(".*", tm.Any(), func(u *tm.Update) {}).Filter),
 		"And.func1",
 	), t)
+	update := &tm.Update{
+		Update: tgbotapi.Update{
+			InlineQuery: &tgbotapi.InlineQuery{
+				Query: "foo:bar:42",
+			},
+		},
+		Context: map[string]interface{}{},
+	}
+	tm.NewInlineQueryHandler(`^foo:(\w+):(\d+)`, nil, func(u *tm.Update) {
+	}).Process(update)
+	assert(reflect.DeepEqual(update.Context["matches"], []string{"foo:bar:42", "bar", "42"}), t)
 
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewCallbackQueryHandler(".*", nil, func(u *tm.Update) {}).Filter),
@@ -194,6 +205,17 @@ func TestConvenienceHandlers(t *testing.T) {
 		getFunctionName(tm.NewCallbackQueryHandler(".*", tm.Any(), func(u *tm.Update) {}).Filter),
 		"And.func1",
 	), t)
+	update = &tm.Update{
+		Update: tgbotapi.Update{
+			CallbackQuery: &tgbotapi.CallbackQuery{
+				Data: "foo:bar:42",
+			},
+		},
+		Context: map[string]interface{}{},
+	}
+	tm.NewCallbackQueryHandler(`^foo:(\w+):(\d+)`, nil, func(u *tm.Update) {
+	}).Process(update)
+	assert(reflect.DeepEqual(update.Context["matches"], []string{"foo:bar:42", "bar", "42"}), t)
 
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewEditedMessageHandler(nil, func(u *tm.Update) {}).Filter),

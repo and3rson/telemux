@@ -66,6 +66,7 @@ func (m *Mux) SetRecover(recover RecoverFunc) *Mux {
 func (m *Mux) tryRecover(u *Update) {
 	if r := recover(); r != nil {
 		err, ok := r.(error)
+		// TODO: Handle stuff like logrus.Entry (implements Stringer)
 		if !ok {
 			err = fmt.Errorf("%v", r)
 		}

@@ -64,23 +64,37 @@ func NewCommandHandler(command string, filter FilterFunc, handles ...HandleFunc)
 
 // NewInlineQueryHandler creates a handler for updates that contain inline query which matches the pattern as regexp.
 func NewInlineQueryHandler(pattern string, filter FilterFunc, handles ...HandleFunc) *Handler {
+	exp := regexp.MustCompile(pattern)
 	newFilter := And(IsInlineQuery(), func(u *Update) bool {
-		return regexp.MustCompile(pattern).Match([]byte(u.InlineQuery.Query))
+		return exp.Match([]byte(u.InlineQuery.Query))
 	})
 	if filter != nil {
 		newFilter = And(newFilter, filter)
 	}
+	handles = append([]HandleFunc{
+		func(u *Update) {
+			u.Context["exp"] = exp
+			u.Context["matches"] = exp.FindStringSubmatch(u.InlineQuery.Query)
+		},
+	}, handles...)
 	return NewHandler(newFilter, handles...)
 }
 
 // NewCallbackQueryHandler creates a handler for updates that contain callback query which matches the pattern as regexp.
 func NewCallbackQueryHandler(pattern string, filter FilterFunc, handles ...HandleFunc) *Handler {
+	exp := regexp.MustCompile(pattern)
 	newFilter := And(IsCallbackQuery(), func(u *Update) bool {
-		return regexp.MustCompile(pattern).Match([]byte(u.CallbackQuery.Data))
+		return exp.Match([]byte(u.CallbackQuery.Data))
 	})
 	if filter != nil {
 		newFilter = And(newFilter, filter)
 	}
+	handles = append([]HandleFunc{
+		func(u *Update) {
+			u.Context["exp"] = exp
+			u.Context["matches"] = exp.FindStringSubmatch(u.CallbackQuery.Data)
+		},
+	}, handles...)
 	return NewHandler(newFilter, handles...)
 }
 
