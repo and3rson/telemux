@@ -1,6 +1,7 @@
 package telemux
 
 import (
+	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -12,7 +13,7 @@ type Update struct {
 	Bot                *tgbotapi.BotAPI
 	Consumed           bool
 	PersistenceContext *PersistenceContext
-	Context            map[string]interface{}
+	Context            Map
 }
 
 // Consume marks update as processed. Used by handler functions to interrupt further processing of the update.
@@ -66,4 +67,23 @@ func (u *Update) EffectiveMessage() *tgbotapi.Message {
 		return u.CallbackQuery.Message
 	}
 	return nil
+}
+
+// Fields returns some metadata of this update. Useful for passing this directly into logrus.WithFields() or other loggers.
+func (u *Update) Fields() Map {
+	chatID := ""
+	chatname := ""
+	userID := ""
+	username := ""
+	chat := u.EffectiveChat()
+	user := u.EffectiveUser()
+	if chat != nil {
+		chatID = fmt.Sprint(chat.ID)
+		chatname = chat.Title
+	}
+	if user != nil {
+		userID = fmt.Sprint(user.ID)
+		username = user.String()
+	}
+	return Map{"chatID": chatID, "chatname": chatname, "userID": userID, "username": username}
 }

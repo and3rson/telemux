@@ -43,7 +43,7 @@ func (c *PersistenceContext) SetData(data Data) {
 
 // ClearData clears data of current conversation.
 func (c *PersistenceContext) ClearData() {
-	c.Persistence.SetData(c.PK, make(map[string]interface{}))
+	c.Persistence.SetData(c.PK, make(Data))
 }
 
 // SetState changes state of current conversation.

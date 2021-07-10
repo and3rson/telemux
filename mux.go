@@ -81,7 +81,7 @@ func (m *Mux) tryRecover(u *Update) {
 // Dispatch tells Mux to process the update.
 // Returns true if the update was processed by one of the handlers.
 func (m *Mux) Dispatch(bot *tgbotapi.BotAPI, u tgbotapi.Update) bool {
-	return m.Process(&Update{u, bot, false, nil, make(map[string]interface{})})
+	return m.Process(&Update{u, bot, false, nil, make(Map)})
 }
 
 // Process runs mux with provided update.
