@@ -90,6 +90,20 @@ func TestCommandHandler(t *testing.T) {
 	if args[1] != "bar" {
 		t.Error("Second arg should be 'bar'")
 	}
+
+	h = tm.NewCommandHandler("foo bar", nil, func(u *tm.Update) {})
+	u.Update.Message.Text = "/foo 42"
+	if !h.Process(u) {
+		t.Error("Handler should process update")
+	}
+	u.Update.Message.Text = "/bar 42"
+	if !h.Process(u) {
+		t.Error("Handler should process update")
+	}
+	u.Update.Message.Text = "/baz 42"
+	if h.Process(u) {
+		t.Error("Handler should not process update")
+	}
 }
 
 func TestConversationHandler(t *testing.T) {
