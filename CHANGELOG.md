@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.8.10
+
+- `handlers`: **allow** NewCommandHandler to accept multiple commands
+
+## v1.8.9
+
+- `update`: **add** Fields method to update
+
+## v1.8.8
+
+- `handlers`: **save** New(Inline|Callback)QueryHandler match in context
+
+## v1.8.7
+
+- `handlers`: **add** pattern to AddInlineQueryHandler & AddCallbackQueryHandler
+- `tests`: **fix** handlers tests
+
+## v1.8.6
+
+- `persistence`: **make** PutDataValue accept interface{}
+
 ## v1.8.5
 
 - `handlers`: **append** default commands to all states except default
