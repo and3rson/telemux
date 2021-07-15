@@ -131,6 +131,9 @@ func NewEditedChannelPostHandler(filter FilterFunc, handles ...HandleFunc) *Hand
 	return NewHandler(newFilter, handles...)
 }
 
+// StateMap is an alias to map of strings to handler slices.
+type StateMap map[string][]*Handler
+
 // NewConversationHandler creates a conversation handler.
 //
 // "conversationID" distinguishes this conversation from the others. The main goal of this identifier is to allow persistence to keep track of different conversation states independently without mixing them together.
@@ -147,13 +150,16 @@ func NewEditedChannelPostHandler(filter FilterFunc, handles ...HandleFunc) *Hand
 func NewConversationHandler(
 	conversationID string,
 	persistence ConversationPersistence,
-	states map[string][]*Handler,
+	states StateMap,
 	defaults []*Handler,
 ) *Handler {
 	var handler *Handler
 	handler = &Handler{
 		func(u *Update) bool {
 			user, chat := u.EffectiveUser(), u.EffectiveChat()
+			if user == nil || chat == nil {
+				return false
+			}
 			pk := PersistenceKey{conversationID, user.ID, chat.ID}
 			state := persistence.GetState(pk)
 			candidates := states[state]

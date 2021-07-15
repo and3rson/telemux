@@ -39,7 +39,7 @@ func main() {
 		AddHandler(tm.NewConversationHandler(
 			"upload_photo_dialog",
 			tm.NewLocalPersistence(), // we could also use `tm.NewFilePersistence("db.json")` or `&gormpersistence.GORMPersistence(db)` to keep data across bot restarts
-			map[string][]*tm.Handler{
+			tm.StateMap{
 				"": {
 					tm.NewHandler(tm.IsCommandMessage("add"), func(u *tm.Update) {
 						bot.Send(tgbotapi.NewMessage(

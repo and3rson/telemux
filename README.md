@@ -304,7 +304,7 @@ To create a ConversationHandler you need to provide the following:
 
     Telemux also supports GORM persistence. If you use GORM, you can store conversation states & data in your database by using `GORMPersistence` from a ![gormpersistence](./gormpersistence) module.
 
-- `states map[string][]*Handler` - defines what handlers to use in which state.
+- `states StateMap` - defines what handlers to use in which state.
 
     States are usually strings like "upload_photo", "send_confirmation", "wait_for_text" and describe the "step" the user is currently at.
     Empty string (`""`) should be used as an initial/final state (i. e. if the conversation has not started yet or has already finished.)

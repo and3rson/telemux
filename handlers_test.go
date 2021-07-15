@@ -125,7 +125,7 @@ func TestConversationHandler(t *testing.T) {
 	h := tm.NewConversationHandler(
 		"test",
 		p,
-		map[string][]*tm.Handler{
+		tm.StateMap{
 			"": {
 				tm.NewCommandHandler("start", nil, func(u *tm.Update) {
 					u.PersistenceContext.SetState("ask_name")
