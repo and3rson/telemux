@@ -42,6 +42,24 @@ func NewMessageHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
 	return NewHandler(newFilter, handles...)
 }
 
+// NewRegexHandler creates a handler for updates that contain message which matches the pattern as regexp.
+func NewRegexHandler(pattern string, filter FilterFunc, handles ...HandleFunc) *Handler {
+	exp := regexp.MustCompile(pattern)
+	newFilter := And(IsMessage(), HasText(), func(u *Update) bool {
+		return exp.Match([]byte(u.Message.Text))
+	})
+	if filter != nil {
+		newFilter = And(newFilter, filter)
+	}
+	handles = append([]HandleFunc{
+		func(u *Update) {
+			u.Context["exp"] = exp
+			u.Context["matches"] = exp.FindStringSubmatch(u.Message.Text)
+		},
+	}, handles...)
+	return NewHandler(newFilter, handles...)
+}
+
 // NewCommandHandler is an extension for NewMessageHandler that creates a handler for updates that contain message with command.
 // It also populates u.Context["args"] with a slice of strings.
 //
@@ -153,6 +171,7 @@ func NewConversationHandler(
 	states StateMap,
 	defaults []*Handler,
 ) *Handler {
+	// TODO: Filters are called twice
 	var handler *Handler
 	handler = &Handler{
 		func(u *Update) bool {

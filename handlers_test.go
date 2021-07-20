@@ -257,4 +257,15 @@ func TestConvenienceHandlers(t *testing.T) {
 		getFunctionName(tm.NewEditedChannelPostHandler(tm.Any(), func(u *tm.Update) {}).Filter),
 		"And.func1",
 	), t)
+
+	update = &tm.Update{
+		Update: tgbotapi.Update{
+			Message: &tgbotapi.Message{
+				Text: "Here is a fraction: 3/5. Parse this!",
+			},
+		},
+		Context: map[string]interface{}{},
+	}
+	tm.NewRegexHandler("([0-9]+)/([1-9][0-9]*)", nil).Process(update)
+	assert(reflect.DeepEqual(update.Context["matches"], []string{"3/5", "3", "5"}), t)
 }

@@ -27,6 +27,8 @@ func TestIsCommandMessage(t *testing.T) {
 	Check("/foo@", true)
 	Check("/foo ", true)
 	Check("/foo bar", true)
+	Check("/foox", false)
+	Check("/fo", false)
 	Check("/foo@testbot", true)
 	Check("/foo@testbot bar", true)
 	Check("/foo@ bar", true)
