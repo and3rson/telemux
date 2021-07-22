@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.8.13
+
+- `filters`: **update** HasText to accept commands too
+
+## v1.8.12
+
+- `handlers`: **add** NewRegexHandler
+
+## v1.8.11
+
+- `readme`: **update** docs
+- `handlers`: **fix** crash in conversation handler when update is empty
+
 ## v1.8.10
 
 - `handlers`: **allow** NewCommandHandler to accept multiple commands
