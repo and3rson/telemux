@@ -160,7 +160,10 @@ func TestConversationHandler(t *testing.T) {
 			},
 		},
 		[]*tm.Handler{
-			tm.NewCommandHandler("cancel", nil, func(u *tm.Update) { u.PersistenceContext.SetState(""); u.PersistenceContext.ClearData() }),
+			tm.NewCommandHandler("cancel", nil, func(u *tm.Update) {
+				u.PersistenceContext.SetState("")
+				u.PersistenceContext.ClearData()
+			}),
 		},
 	)
 	pk := tm.PersistenceKey{"test", 13, 37}

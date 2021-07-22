@@ -45,7 +45,7 @@ func NewMessageHandler(filter FilterFunc, handles ...HandleFunc) *Handler {
 // NewRegexHandler creates a handler for updates that contain message which matches the pattern as regexp.
 func NewRegexHandler(pattern string, filter FilterFunc, handles ...HandleFunc) *Handler {
 	exp := regexp.MustCompile(pattern)
-	newFilter := And(IsMessage(), HasText(), func(u *Update) bool {
+	newFilter := And(IsMessage(), func(u *Update) bool {
 		return exp.Match([]byte(u.Message.Text))
 	})
 	if filter != nil {
