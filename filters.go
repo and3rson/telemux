@@ -58,12 +58,11 @@ func IsEditedChannelPost() FilterFunc {
 	}
 }
 
-// HasText filters updates that look like text,
-// i. e. have some text and do not start with a slash ("/").
+// HasText filters updates that look like text, i. e. have some text
 func HasText() FilterFunc {
 	return func(u *Update) bool {
 		message := u.EffectiveMessage()
-		return message != nil && message.Text != "" && message.Text[0] != '/'
+		return message != nil && message.Text != ""
 	}
 }
 
