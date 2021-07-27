@@ -25,6 +25,8 @@ Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-t
   - [Getting user/chat/message object from update](#getting-userchatmessage-object-from-update)
   - [Properly filtering updates](#properly-filtering-updates)
 
+## Note: this is a readme for v1 which integrates with go-telegram-bot-api@v4.6.4 which is missing a lot of Telegram features. Please check out the [telemux/v2 branch](//github.com/and3rson/telemux/tree/v2) for best experience.
+
 # Motivation
 
 This library serves as an addition to the [go-telegram-bot-api](https://github.com/go-telegram-bot-api/telegram-bot-api) library.
