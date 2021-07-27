@@ -1,4 +1,4 @@
-module github.com/and3rson/telemux/v2/gormpersistence
+module github.com/and3rson/telemux/gormpersistence/v2
 
 go 1.16
 
