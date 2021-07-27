@@ -150,14 +150,17 @@ func main() {
 						"Photo not found!",
 					))
 				} else {
-					share := tgbotapi.NewPhoto(u.Message.Chat.ID, match.FileID)
+					share := tgbotapi.NewPhoto(u.Message.Chat.ID, tgbotapi.FileID(match.FileID))
 					share.Caption = fmt.Sprintf("Description: %s", match.Description)
-					bot.Send(share)
+					_, err := bot.Send(share)
+					if err != nil {
+						log.Printf("main: send file: %s", err)
+					}
 				}
 			},
 		)).
-		AddHandler(tm.NewHandler(
-			tm.Any(),
+		AddHandler(tm.NewMessageHandler(
+			nil,
 			func(u *tm.Update) {
 				message := tgbotapi.NewMessage(
 					u.Message.Chat.ID,
