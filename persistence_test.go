@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	tm "github.com/and3rson/telemux"
+	tm "github.com/and3rson/telemux/v2"
 )
 
 func TestPersistenceKey(t *testing.T) {

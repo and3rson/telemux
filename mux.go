@@ -1,14 +1,14 @@
 // Package telemux is a flexible message router add-on for "go-telegram-bot-api".
 //
 // Make sure to check "go-telegram-bot-api" documentation first:
-// https://github.com/go-telegram-bot-api/telegram-bot-api
+// https://github.com/go-telegram-bot-api/telegram-bot-api/v5
 package telemux
 
 import (
 	"fmt"
 	"runtime/debug"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 // RecoverFunc handles panics which happen during Dispatch.

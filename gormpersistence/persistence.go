@@ -1,7 +1,7 @@
 package gormpersistence
 
 import (
-	tm "github.com/and3rson/telemux"
+	tm "github.com/and3rson/telemux/v2"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

@@ -50,8 +50,8 @@ This project is in early beta stage. Contributions are welcome! Feel free to sub
 package main
 
 import (
-    tm "github.com/and3rson/telemux"
-    tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+    tm "github.com/and3rson/telemux/v2"
+    tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
     "os"
 )
 

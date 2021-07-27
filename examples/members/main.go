@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	tm "github.com/and3rson/telemux"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tm "github.com/and3rson/telemux/v2"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 // KnownGroups contains list of groups that bot can be invited to
@@ -51,22 +51,19 @@ func main() {
 
 	knownGroups.LoadFromEnv()
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 	mux := tm.NewMux().
 		AddHandler(tm.NewHandler(
 			tm.IsNewChatMembers(),
 			func(u *tm.Update) {
 				chat := u.EffectiveChat()
 				// Check every new member
-				for _, user := range *u.Message.NewChatMembers {
+				for _, user := range u.Message.NewChatMembers {
 					if user.ID == bot.Self.ID {
 						// This is us!
 						if !knownGroups.IsKnownGroup(chat.ID) {
 							// Group is unknown, leave chat
-							bot.LeaveChat(tgbotapi.ChatConfig{ChatID: chat.ID, SuperGroupUsername: ""})
+							bot.Send(tgbotapi.LeaveChatConfig{ChatID: chat.ID})
 						}
 					} else {
 						// Greet new member

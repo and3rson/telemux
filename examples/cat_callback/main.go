@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"os"
 
-	tm "github.com/and3rson/telemux"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tm "github.com/and3rson/telemux/v2"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 // CatInfo describes cat picture
@@ -48,10 +48,7 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 
 	loadingMarkup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
@@ -100,7 +97,7 @@ func main() {
 			tm.IsCallbackQuery(),
 			func(u *tm.Update) {
 				go func() {
-					bot.AnswerCallbackQuery(tgbotapi.NewCallback(u.CallbackQuery.ID, "Refreshing..."))
+					bot.Send(tgbotapi.NewCallback(u.CallbackQuery.ID, "Refreshing..."))
 					bot.Send(tgbotapi.NewEditMessageReplyMarkup(
 						u.CallbackQuery.Message.Chat.ID,
 						u.CallbackQuery.Message.MessageID,

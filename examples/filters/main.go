@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	tm "github.com/and3rson/telemux"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tm "github.com/and3rson/telemux/v2"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
@@ -19,10 +19,7 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 	mux := tm.NewMux().
 		AddHandler(tm.NewHandler(
 			tm.IsCommandMessage("start"),
@@ -45,7 +42,7 @@ func main() {
 		AddHandler(tm.NewHandler(
 			tm.HasPhoto(),
 			func(u *tm.Update) {
-				photo := (*u.Message.Photo)[0]
+				photo := u.Message.Photo[0]
 				bot.Send(tgbotapi.NewMessage(
 					u.Message.Chat.ID,
 					fmt.Sprintf("You sent me a photo of size %d x %d", photo.Width, photo.Height),

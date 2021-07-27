@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	tm "github.com/and3rson/telemux"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tm "github.com/and3rson/telemux/v2"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
@@ -20,10 +20,7 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 	// Register two sub-Mux instances. First will handle updates in private chats, second - in group chats.
 	mux := tm.NewMux().
 		AddMux(tm.NewMux().
@@ -41,7 +38,7 @@ func main() {
 				))
 			})).
 			AddHandler(tm.NewHandler(tm.IsCommandMessage("cheer"), func(u *tm.Update) {
-				bot.Send(tgbotapi.NewStickerShare(u.EffectiveChat().ID, "CAACAgIAAxkBAAECg_1g3b2j0AHBrbm0zPxlkWGDxoYq7QACsQADwPsIAAED7avN0x5kmSAE"))
+				bot.Send(tgbotapi.NewSticker(u.EffectiveChat().ID, "CAACAgIAAxkBAAECg_1g3b2j0AHBrbm0zPxlkWGDxoYq7QACsQADwPsIAAED7avN0x5kmSAE"))
 				bot.Send(tgbotapi.NewMessage(
 					u.Message.Chat.ID,
 					"PRT HRD!",

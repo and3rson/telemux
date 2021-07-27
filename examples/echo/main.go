@@ -2,8 +2,8 @@
 package main
 
 import (
-	tm "github.com/and3rson/telemux"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tm "github.com/and3rson/telemux/v2"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
 	"os"
 )
@@ -17,10 +17,7 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 	mux := tm.NewMux().
 		AddHandler(tm.NewHandler(
 			tm.IsCommandMessage("start"),

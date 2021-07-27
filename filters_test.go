@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	tm "github.com/and3rson/telemux"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tm "github.com/and3rson/telemux/v2"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func TestIsCommandMessage(t *testing.T) {
@@ -100,7 +100,7 @@ func TestContentFilters(t *testing.T) {
 
 	u = &tm.Update{}
 	assert(!tm.HasPhoto()(u), t)
-	u.Message = &tgbotapi.Message{Photo: &[]tgbotapi.PhotoSize{}}
+	u.Message = &tgbotapi.Message{Photo: []tgbotapi.PhotoSize{}}
 	assert(tm.HasPhoto()(u), t)
 
 	u = &tm.Update{}
@@ -115,7 +115,7 @@ func TestContentFilters(t *testing.T) {
 
 	u = &tm.Update{}
 	assert(!tm.HasAnimation()(u), t)
-	u.Message = &tgbotapi.Message{Animation: &tgbotapi.ChatAnimation{}}
+	u.Message = &tgbotapi.Message{Animation: &tgbotapi.Animation{}}
 	assert(tm.HasAnimation()(u), t)
 
 	u = &tm.Update{}
@@ -189,7 +189,7 @@ func TestUpdateMembers(t *testing.T) {
 	assert(!tm.IsNewChatMembers()(u), t)
 	u.Message = &tgbotapi.Message{}
 	assert(!tm.IsNewChatMembers()(u), t)
-	u.Message.NewChatMembers = &[]tgbotapi.User{{}}
+	u.Message.NewChatMembers = []tgbotapi.User{{}}
 	assert(tm.IsNewChatMembers()(u), t)
 
 	u = &tm.Update{}

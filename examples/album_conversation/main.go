@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	tm "github.com/and3rson/telemux"
+	tm "github.com/and3rson/telemux/v2"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 // Photo describes a submitted photo
@@ -30,10 +30,7 @@ func main() {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
-	updates, err := bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatal(err)
-	}
+	updates := bot.GetUpdatesChan(u)
 	var photos []Photo
 	mux := tm.NewMux().
 		AddHandler(tm.NewConversationHandler(
@@ -52,7 +49,7 @@ func main() {
 				"upload_photo": {
 					tm.NewHandler(tm.HasPhoto(), func(u *tm.Update) {
 						data := u.PersistenceContext.GetData()
-						data["photoID"] = (*u.Message.Photo)[0].FileID
+						data["photoID"] = u.Message.Photo[0].FileID
 						u.PersistenceContext.SetData(data)
 						bot.Send(tgbotapi.NewMessage(
 							u.Message.Chat.ID,
@@ -153,7 +150,7 @@ func main() {
 						"Photo not found!",
 					))
 				} else {
-					share := tgbotapi.NewPhotoShare(u.Message.Chat.ID, match.FileID)
+					share := tgbotapi.NewPhoto(u.Message.Chat.ID, match.FileID)
 					share.Caption = fmt.Sprintf("Description: %s", match.Description)
 					bot.Send(share)
 				}

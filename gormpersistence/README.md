@@ -18,9 +18,9 @@ import (
     "log"
     "os"
 
-    tm "github.com/and3rson/telemux"
+    tm "github.com/and3rson/telemux/v2"
     "github.com/and3rson/telemux/gormpersistence"
-    tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+    tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {

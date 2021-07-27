@@ -62,7 +62,7 @@ func (c *PersistenceContext) PutDataValue(key string, value interface{}) {
 // PersistenceKey contains user & chat IDs. It is used to identify conversations with different users in different chats.
 type PersistenceKey struct {
 	ConversationID string `gorm:"primaryKey;autoIncrement:false"`
-	UserID         int    `gorm:"primaryKey;autoIncrement:false"` // TODO: Change to int64
+	UserID         int64  `gorm:"primaryKey;autoIncrement:false"`
 	ChatID         int64  `gorm:"primaryKey;autoIncrement:false"`
 }
 
@@ -88,7 +88,7 @@ func (k *PersistenceKey) UnmarshalText(b []byte) error {
 		return err
 	}
 	k.ChatID = chatID
-	userID, err := strconv.Atoi(userIDstr)
+	userID, err := strconv.ParseInt(userIDstr, 10, 64)
 	if err != nil {
 		return err
 	}
