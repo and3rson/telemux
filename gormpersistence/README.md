@@ -5,7 +5,7 @@ Support for GORM as persistence backend.
 ## Installation
 
 ```sh
-go get github.com/and3rson/telemux/gormpersistence
+go get github.com/and3rson/telemux/gormpersistence/v2
 ```
 
 ## Example usage
@@ -19,7 +19,7 @@ import (
     "os"
 
     tm "github.com/and3rson/telemux/v2"
-    "github.com/and3rson/telemux/gormpersistence"
+    "github.com/and3rson/telemux/gormpersistence/v2"
     tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
