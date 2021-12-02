@@ -4,6 +4,7 @@ Flexible message router add-on for [go-telegram-bot-api](https://github.com/go-t
 [![GitHub tag](https://img.shields.io/github/tag/and3rson/telemux.svg?sort=semver)](https://GitHub.com/and3rson/telemux/tags/) [![Go Reference](https://pkg.go.dev/badge/github.com/and3rson/telemux.svg)](https://pkg.go.dev/github.com/and3rson/telemux) [![Build Status](https://travis-ci.com/and3rson/telemux.svg?branch=main)](https://travis-ci.com/and3rson/telemux) [![Maintainability](https://api.codeclimate.com/v1/badges/63d82ddd3151594c3765/maintainability)](https://codeclimate.com/github/and3rson/telemux/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/63d82ddd3151594c3765/test_coverage)](https://codeclimate.com/github/and3rson/telemux/test_coverage) [![Go Report Card](https://goreportcard.com/badge/github.com/and3rson/telemux)](https://goreportcard.com/report/github.com/and3rson/telemux) [![stability-unstable](https://img.shields.io/badge/stability-unstable-yellow.svg)](https://github.com/emersion/stability-badges#unstable)
 
 ![Screenshot](./sample_screenshot.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fand3rson%2Ftelemux.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fand3rson%2Ftelemux?ref=badge_shield)
 
 <!-- TOC generated with https://luciopaiva.com/markdown-toc/ -->
 # Table of contents
@@ -401,3 +402,7 @@ IsCommandMessage("my_command") // OK: IsCommand() already checks for IsMessage()
 And(IsCommandMessage("start"), IsMessage()) // IsMessage() is unnecessary
 And(IsCommandMessage("start"), Not(IsEditedMessage())) // Not(IsEditedMessage()) is unnecessary
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fand3rson%2Ftelemux.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fand3rson%2Ftelemux?ref=badge_large)
