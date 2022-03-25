@@ -236,7 +236,7 @@ func TestConvenienceHandlers(t *testing.T) {
 
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewEditedMessageHandler(nil, func(u *tm.Update) {}).Filter),
-		"IsEditedMessage.func1",
+		"NewEditedMessageHandler.func1",
 	), t)
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewEditedMessageHandler(tm.Any(), func(u *tm.Update) {}).Filter),
@@ -245,7 +245,7 @@ func TestConvenienceHandlers(t *testing.T) {
 
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewChannelPostHandler(nil, func(u *tm.Update) {}).Filter),
-		"IsChannelPost.func1",
+		"NewChannelPostHandler.func1",
 	), t)
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewChannelPostHandler(tm.Any(), func(u *tm.Update) {}).Filter),
@@ -254,7 +254,7 @@ func TestConvenienceHandlers(t *testing.T) {
 
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewEditedChannelPostHandler(nil, func(u *tm.Update) {}).Filter),
-		"IsEditedChannelPost.func1",
+		"NewEditedChannelPostHandler.func1",
 	), t)
 	assert(strings.HasSuffix(
 		getFunctionName(tm.NewEditedChannelPostHandler(tm.Any(), func(u *tm.Update) {}).Filter),

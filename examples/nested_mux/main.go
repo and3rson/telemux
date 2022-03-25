@@ -38,7 +38,7 @@ func main() {
 				))
 			})).
 			AddHandler(tm.NewHandler(tm.IsCommandMessage("cheer"), func(u *tm.Update) {
-				bot.Send(tgbotapi.NewSticker(u.EffectiveChat().ID, "CAACAgIAAxkBAAECg_1g3b2j0AHBrbm0zPxlkWGDxoYq7QACsQADwPsIAAED7avN0x5kmSAE"))
+				bot.Send(tgbotapi.NewSticker(u.EffectiveChat().ID, tgbotapi.FileID("CAACAgIAAxkBAAECg_1g3b2j0AHBrbm0zPxlkWGDxoYq7QACsQADwPsIAAED7avN0x5kmSAE")))
 				bot.Send(tgbotapi.NewMessage(
 					u.Message.Chat.ID,
 					"PRT HRD!",
