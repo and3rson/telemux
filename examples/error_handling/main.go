@@ -17,6 +17,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -56,6 +57,7 @@ func main() {
 				log.Printf("Warning! An error occurred: %s", err)
 			}
 		})
+
 	for update := range updates {
 		mux.Dispatch(bot, update)
 	}

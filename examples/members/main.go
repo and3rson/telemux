@@ -18,23 +18,25 @@ type KnownGroups struct {
 }
 
 // LoadFromEnv reads known groups from env var
-func (k KnownGroups) LoadFromEnv() {
+func (k *KnownGroups) LoadFromEnv() {
 	for _, idStr := range strings.Split(os.Getenv("KNOWN_GROUPS"), ",") {
 		id, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
 			panic(err)
 		}
+
 		k.ids = append(k.ids, id)
 	}
 }
 
 // IsKnownGroup checks if groups is known
-func (k KnownGroups) IsKnownGroup(id int64) bool {
+func (k *KnownGroups) IsKnownGroup(id int64) bool {
 	for _, otherID := range k.ids {
 		if id == otherID {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -45,6 +47,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -82,6 +85,7 @@ func main() {
 				))
 			},
 		))
+
 	for update := range updates {
 		mux.Dispatch(bot, update)
 	}

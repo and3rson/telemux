@@ -28,14 +28,17 @@ func GetRandomCatURL() (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
+
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
+
 	var catInfos []CatInfo
 	if err := json.Unmarshal(data, &catInfos); err != nil {
 		return "", err
 	}
+
 	return catInfos[0].URL, nil
 }
 
@@ -44,6 +47,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -82,6 +86,7 @@ func main() {
 							u.Message.Chat.ID,
 							fmt.Sprintf("Oops, an error occurred: %s", err),
 						))
+
 						return
 					}
 					message := tgbotapi.NewMessage(

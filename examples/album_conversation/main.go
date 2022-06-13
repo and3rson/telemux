@@ -26,12 +26,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
 	updates := bot.GetUpdatesChan(u)
+
 	var photos []Photo
+
 	mux := tm.NewMux().
 		AddHandler(tm.NewConversationHandler(
 			"upload_photo_dialog",
@@ -139,9 +142,9 @@ func main() {
 			func(u *tm.Update) {
 				photoID := strings.Split(u.Message.Text, "_")[1]
 				var match *Photo
-				for _, photo := range photos {
+				for i, photo := range photos {
 					if fmt.Sprint(photo.ID) == photoID {
-						match = &photo
+						match = &photos[i]
 					}
 				}
 				if match == nil {

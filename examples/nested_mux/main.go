@@ -16,6 +16,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	bot.Debug = true
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -60,6 +61,7 @@ func main() {
 				"Sorry, I can't do that.",
 			))
 		}))
+
 	for update := range updates {
 		mux.Dispatch(bot, update)
 	}
